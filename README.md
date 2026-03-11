@@ -77,8 +77,6 @@ if prompted, run `codex` once and complete sign-in. keep your env vars loaded be
 
 this repo targets the newer codex harness layout built around `AGENTS.md`, `rules/`, and `skills/`.
 
-older local codex cli builds may still look for `codex.md` project docs. this repo does not add compatibility shims for that older layout.
-
 ### 3. runpod / docker gpu setup
 
 for running claude code on a remote GPU instance (runpod, etc.):
