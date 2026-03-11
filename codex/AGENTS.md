@@ -8,6 +8,10 @@
 - no emojis
 - no em dashes - use hyphens or colons instead
 
+## javascript/typescript
+
+- always use bun instead of npm/yarn/npx (bun install, bun run, bunx)
+
 ## python
 
 - use uv for everything: uv run, uv pip, uv venv
@@ -32,6 +36,7 @@
 - no signatures or co-authored-by lines
 - commit after completing each task
 - commit after each feature
+- commit after each discrete change unit - do not batch unrelated changes into one commit
 
 ## behavior
 
@@ -75,6 +80,30 @@ CONCERNS:
 - [risks or things to verify]
 ```
 
+### post-edit checks
+
+after editing code:
+
+1. run the narrowest formatter, lint, or test command that validates the change
+2. prefer bun-based commands for javascript/typescript projects when available
+3. report when checks were skipped or could not run
+
+### worktree workflow
+
+when starting a non-trivial task (not config tweaks, not quick fixes):
+
+1. determine a short descriptive name from the task (e.g., `auth-fix`, `add-search`)
+2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b codex/<name>`
+3. cd into the new worktree directory
+4. do all work there
+5. when done, tell the user the branch name and worktree path
+
+skip worktree creation if:
+
+- already in a worktree (check: `git rev-parse --show-toplevel` differs from `git worktree list` main)
+- the task is trivial (single file edit, config change)
+- the user explicitly says to work on the current branch
+
 ## failure modes to avoid
 
 1. making assumptions without checking
@@ -103,6 +132,7 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 ### research
 
 - for all the principles below always use nia to research and index documents when needed
+- check nia sources and saved context first when they are relevant
 - use nia mcp as ground truth source
 
 ### scaling
