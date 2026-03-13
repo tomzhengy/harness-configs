@@ -95,8 +95,17 @@ fi
 
 # ---- clone config repo ----
 echo "--- config repo ---"
-CONFIG_DIR="$PERSIST_DIR/claude-code-config"
-REPO_URL="https://github.com/tomzhengy/claude-code.git"
+LEGACY_CONFIG_DIR="$PERSIST_DIR/claude-code-config"
+OLD_CONFIG_DIR="$PERSIST_DIR/coding-config"
+CONFIG_DIR="$PERSIST_DIR/harness-configs"
+REPO_URL="https://github.com/tomzhengy/harness-configs.git"
+
+# migrate older persisted checkouts to the new repo directory name
+if [ ! -e "$CONFIG_DIR" ] && [ -d "$OLD_CONFIG_DIR" ]; then
+    mv "$OLD_CONFIG_DIR" "$CONFIG_DIR"
+elif [ ! -e "$CONFIG_DIR" ] && [ -d "$LEGACY_CONFIG_DIR" ]; then
+    mv "$LEGACY_CONFIG_DIR" "$CONFIG_DIR"
+fi
 
 if [ -d "$CONFIG_DIR/.git" ]; then
     echo "config repo exists, pulling latest..."
@@ -111,7 +120,7 @@ else
         git -c "http.https://github.com/.extraheader=Authorization: token ${GITHUB_PERSONAL_ACCESS_TOKEN}" \
             clone -q "$REPO_URL" "$CONFIG_DIR"
     else
-        git clone -q "git@github.com:tomzhengy/claude-code.git" "$CONFIG_DIR"
+        git clone -q "git@github.com:tomzhengy/harness-configs.git" "$CONFIG_DIR"
     fi
     echo "config repo cloned"
 fi

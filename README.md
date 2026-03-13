@@ -1,4 +1,4 @@
-# claude-code-config
+# harness-configs
 
 claude code and codex cli config files. please feel free to add suggestions!! i enjoy optimizing my agent workflows.
 
@@ -41,7 +41,7 @@ set +a
 
 ### 2.1 claude code symlinks
 
-from the `claude-code-config` directory, symlink these to `~/.claude/`:
+from the `harness-configs` directory, symlink these to `~/.claude/`:
 
 ```bash
 ln -s $(pwd)/claude-code/config/settings.json ~/.claude/settings.json
@@ -55,7 +55,7 @@ ln -s $(pwd)/claude-code/commands ~/.claude/commands
 
 ### 2.2 codex cli setup
 
-from the `claude-code-config` directory, symlink these files to `~/.codex/`:
+from the `harness-configs` directory, symlink these files to `~/.codex/`:
 
 ```bash
 mkdir -p ~/.codex
@@ -127,7 +127,7 @@ the image is based on `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404` and adds
 if you already have a GPU instance running, just curl the bootstrap script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/tomzhengy/claude-code/main/gpu-setup/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tomzhengy/harness-configs/main/gpu-setup/bootstrap.sh | bash
 ```
 
 this installs everything and sets up config. it's idempotent so you can run it again after a restart.
