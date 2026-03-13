@@ -60,11 +60,14 @@ from the `harness-configs` directory, symlink these files to `~/.codex/`:
 
 ```bash
 mkdir -p ~/.codex
+mkdir -p ~/.codex/skills
 ln -sf $(pwd)/codex/config.toml ~/.codex/config.toml
 ln -sf $(pwd)/codex/AGENTS.md ~/.codex/AGENTS.md
 ln -sf $(pwd)/codex/instructions.md ~/.codex/instructions.md
 ln -sfn $(pwd)/codex/rules ~/.codex/rules
-ln -sfn $(pwd)/codex/skills ~/.codex/skills
+for skill in codex/skills/*; do
+  ln -sfn "$(pwd)/$skill" ~/.codex/skills/"$(basename "$skill")"
+done
 ```
 
 verify codex setup:
@@ -77,6 +80,7 @@ ls -la ~/.codex
 if prompted, run `codex` once and complete sign-in. keep your env vars loaded before launching codex so mcp tokens resolve correctly.
 
 this repo targets the newer codex harness layout built around `AGENTS.md`, `rules/`, and `skills/`.
+codex-managed system skills should stay in `~/.codex/skills/.system`, not in this repo.
 
 ### 3. runpod / docker gpu setup
 
@@ -170,7 +174,6 @@ codex/
   rules/
     default.rules          # mirrored command allow rules
   skills/
-    .system/               # bundled system skills from openai
     plan/                  # implementation planning skill
     nia-research/          # nia-first external research skill
     commit-message/        # commit title generation skill
