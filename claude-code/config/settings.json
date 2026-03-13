@@ -198,5 +198,6 @@
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true
   },
-  "fastMode": true
+  "fastMode": true,
+  "effortLevel": "high"
 }
