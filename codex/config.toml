@@ -10,6 +10,6 @@ args = ["-y", "@modelcontextprotocol/server-github"]
 env = { GITHUB_PERSONAL_ACCESS_TOKEN = "${GITHUB_PERSONAL_ACCESS_TOKEN}" }
 
 [mcp_servers.nia]
-command = "pipx"
-args = ["run", "--no-cache", "nia-mcp-server"]
+command = "/Users/tomzheng/.local/bin/nia-mcp-server"
+args = []
 env = { NIA_API_KEY = "${NIA_API_KEY}", NIA_API_URL = "https://apigcp.trynia.ai/" }
