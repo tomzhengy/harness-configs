@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "deny": ["Agent(code-reviewer)", "Agent(code-simplifier)"],
     "allow": [
       "Read",
       "Glob",
