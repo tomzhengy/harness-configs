@@ -120,7 +120,7 @@ docker push <your-dockerhub-username>/claude-gpu
 3. deploy a pod using the template:
 
    - go to **pods** > **deploy** and select your `claude-gpu` template
-   - pick a GPU (A100, H100, etc.)
+   - pick a GPU
    - click **deploy**
    - once running, grab the ssh command from the pod's **connect** menu
    - ssh in and run `claude`
