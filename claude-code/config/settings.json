@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "deny": ["Agent(code-reviewer)", "Agent(code-simplifier)"],
     "allow": [
       "Read",
       "Glob",
@@ -98,9 +97,12 @@
       "mcp__nia__nia_package_search_hybrid",
       "mcp__nia__context",
       "mcp__nia__index"
+    ],
+    "deny": [
+      "Agent(code-reviewer)",
+      "Agent(code-simplifier)"
     ]
   },
-  "model": "opus",
   "hooks": {
     "PostToolUse": [
       {
@@ -199,6 +201,6 @@
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true
   },
-  "fastMode": true,
-  "effortLevel": "high"
+  "effortLevel": "high",
+  "fastMode": true
 }
