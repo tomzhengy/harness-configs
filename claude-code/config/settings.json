@@ -72,7 +72,6 @@
       "Bash(cargo:*)",
       "Bash(rustc:*)",
       "Bash(go:*)",
-      "Bash(codex:*)",
       "Bash(docker:*)",
       "mcp__github__get_file_contents",
       "mcp__github__get_issue",
@@ -99,7 +98,10 @@
       "mcp__nia__context",
       "mcp__nia__index"
     ],
-    "deny": ["Agent(code-reviewer)", "Agent(code-simplifier)"]
+    "deny": [
+      "Agent(code-reviewer)",
+      "Agent(code-simplifier)"
+    ]
   },
   "hooks": {
     "PostToolUse": [
@@ -197,8 +199,7 @@
     "command": "~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "swift-lsp@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "swift-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
   "fastMode": true
