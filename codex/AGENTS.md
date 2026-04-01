@@ -160,6 +160,7 @@ don't fill architectural gaps with generic patterns - go back and forth until th
 
 use these local skills when the task matches them:
 
+- `claude` - use the local Claude Code CLI for read-only review, challenge, or consult second opinions from inside codex
 - `plan` - research a codebase and write decision-complete implementation plans before coding
 - `nia-research` - use nia for external repository, documentation, and package research
 - `commit-message` - draft one-line conventional commit messages from the current git state

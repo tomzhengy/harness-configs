@@ -58,6 +58,7 @@ prefix_rule(
 
 # mirror current claude settings.json command-family breadth
 prefix_rule(pattern=["curl"], decision="allow")
+prefix_rule(pattern=["claude"], decision="allow")
 prefix_rule(pattern=["gh"], decision="allow")
 prefix_rule(pattern=["brew"], decision="allow")
 prefix_rule(pattern=["git"], decision="allow")

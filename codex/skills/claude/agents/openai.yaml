@@ -1,0 +1,7 @@
+interface:
+  display_name: "Claude"
+  short_description: "Get a Claude Code second opinion"
+  default_prompt: "Use $claude to ask Claude Code for a read-only second opinion on the current changes or question."
+
+policy:
+  allow_implicit_invocation: false
