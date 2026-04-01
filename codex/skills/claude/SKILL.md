@@ -48,7 +48,9 @@ Get an independent read-only opinion from the local Claude Code CLI.
      TMPERR=$(mktemp /tmp/claude-err-XXXXXX.txt)
      ```
 4. review mode
+
    - construct this prompt, appending any extra user instructions at the end:
+
      ```text
      Review the current branch diff against origin/<base>. Run `git diff origin/<base>` and inspect the changed files in full.
 
@@ -61,12 +63,16 @@ Get an independent read-only opinion from the local Claude Code CLI.
 
      Be direct. No compliments.
      ```
+
    - run Claude with `claude -p "<prompt>" ... >"$TMPRESP" 2>"$TMPERR"`
    - present the output verbatim in a `CLAUDE SAYS (code review)` block
    - set the gate to `FAIL` if the output contains `[P1]` or `overall: fail`
    - otherwise set the gate to `PASS`
+
 5. challenge mode
+
    - construct this prompt, replacing `<focus>` when the user provided one:
+
      ```text
      Review the current branch diff against origin/<base>. Run `git diff origin/<base>` and inspect the changed files in full.
 
@@ -81,8 +87,10 @@ Get an independent read-only opinion from the local Claude Code CLI.
 
      Be adversarial. No compliments.
      ```
+
    - run Claude with `claude -p "<prompt>" ... >"$TMPRESP" 2>"$TMPERR"`
    - present the output verbatim in a `CLAUDE SAYS (adversarial challenge)` block
+
 6. consult mode
    - if the user explicitly wants to continue, resume, or follow up on an earlier Claude exchange, run `claude -c -p "<prompt>" ...`
    - otherwise start fresh with `claude -p "<prompt>" ...`

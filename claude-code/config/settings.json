@@ -98,10 +98,7 @@
       "mcp__nia__context",
       "mcp__nia__index"
     ],
-    "deny": [
-      "Agent(code-reviewer)",
-      "Agent(code-simplifier)"
-    ]
+    "deny": []
   },
   "hooks": {
     "PostToolUse": [

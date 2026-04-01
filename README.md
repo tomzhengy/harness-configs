@@ -11,7 +11,6 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **git worktree workflow** - auto-creates worktrees for non-trivial tasks to isolate branches across sessions
 - **behavioral guardrails** - assumption surfacing, confusion management, change summaries
 - **systems-first design** - iterates on system design before writing code
-- **plan agent** - architecture planning agent using opus model for deeper reasoning
 - **/commit command** - auto-generate commit messages from git changes
 - **/merge command** - merge a worktree branch back into the target branch and clean up
 - **nia research rules** - integrated nia mcp for external code/docs research and indexing
@@ -23,12 +22,49 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **instruction parity** - codex `AGENTS.md` mirrors the current claude workflow rules: bun-first js/ts, assumption surfacing, worktree workflow, post-edit checks, and nia-first research
 - **broad command rules** - codex `rules/default.rules` mirrors the current claude command-family allowlist rather than the older tighter readme wording
 - **skill-based workflow ports** - local skills replace the claude plan agent and the `/commit` and `/merge` commands
-- **manual-use review tools** - local `code-reviewer` and `code-simplifier` skills replace the disabled claude agents without making them implicit
 - **explicit native gaps** - codex does not currently replicate claude's sound notifications, custom statusline scripting, edit-triggered hooks, or swift plugin support in this repo
 
-## setup
+## installation
 
-### 1. environment variables
+### quick install (30 seconds)
+
+open claude code and paste this:
+
+```
+Install harness-configs: run git clone --depth 1 https://github.com/tomzhengy/harness-configs.git ~/.claude/skills/_harness-configs && cd ~/.claude/skills/_harness-configs && ./setup.sh
+```
+
+claude will clone the repo and run the setup script. the script merges settings into your existing config (additive only, never removes your settings), appends CLAUDE.md instructions, and copies rules and skills into place. existing files are backed up before modification.
+
+requires `jq` (`brew install jq` on macOS, `sudo apt-get install jq` on linux).
+
+### manual install
+
+```bash
+git clone https://github.com/tomzhengy/harness-configs.git
+cd harness-configs
+./setup.sh
+```
+
+### for repo authors
+
+use `--link` to create symlinks instead of copies, so edits flow back to the repo:
+
+```bash
+./setup.sh --link
+```
+
+### updating
+
+pull the latest changes and re-run setup. the script is idempotent:
+
+```bash
+cd ~/.claude/skills/_harness-configs  # or wherever you cloned
+git pull
+./setup.sh
+```
+
+### environment variables
 
 copy `.env.example` to `.env`, add your api keys, then load it in your shell:
 
@@ -40,22 +76,11 @@ source .env
 set +a
 ```
 
-### 2.1 claude code symlinks
+### mcp servers
 
-from the `harness-configs` directory, symlink these to `~/.claude/`:
+use `claude-code/config/mcp.json` as a reference template and merge those entries into `~/.claude.json` with your API keys. the gpu bootstrap script handles this merge automatically.
 
-```bash
-ln -s $(pwd)/claude-code/config/settings.json ~/.claude/settings.json
-ln -s $(pwd)/claude-code/config/CLAUDE.md ~/.claude/CLAUDE.md
-ln -s $(pwd)/claude-code/config/statusline-command.sh ~/.claude/statusline-command.sh
-ln -s $(pwd)/claude-code/agents ~/.claude/agents
-ln -s $(pwd)/claude-code/rules ~/.claude/rules
-ln -s $(pwd)/claude-code/commands ~/.claude/commands
-```
-
-for MCP servers, use `claude-code/config/mcp.json` as a reference template and merge those entries into `~/.claude.json`. the gpu bootstrap script already handles that merge automatically.
-
-### 2.2 codex cli setup
+### codex cli setup
 
 from the `harness-configs` directory, symlink these files to `~/.codex/`:
 
@@ -148,18 +173,14 @@ this installs everything and sets up config. it's idempotent so you can run it a
 ## structure
 
 ```
+setup.sh                        # install script (./setup.sh or ./setup.sh --link)
+
 claude-code/
   config/
     settings.json           # model, permissions, statusline, hooks (prettier, lint, sounds)
     mcp.json                # reference MCP server entries for ~/.claude.json
     CLAUDE.md               # global instructions (style, behavior, principles)
     statusline-command.sh   # custom statusline with git branch, model, context
-
-  agents/
-    plan.md                 # architecture planning
-    disabled/
-      code-reviewer.md      # proactive code review (disabled)
-      code-simplifier.md    # proactive code simplification (disabled)
 
   rules/
     nia.md                  # nia research assistant rules
