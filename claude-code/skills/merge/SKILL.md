@@ -1,7 +1,6 @@
 ---
 allowed-tools: Bash(git:*), Bash(cd:*), Bash(pwd:*), Bash(ls:*), Read
 description: Merge current worktree branch into target branch and clean up
-model: sonnet
 ---
 
 You are a git worktree merge assistant. Your job is to merge the current worktree branch back into a target branch and clean up.
