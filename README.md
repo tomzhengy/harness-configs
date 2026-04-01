@@ -16,6 +16,7 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **/merge command** - merge a worktree branch back into the target branch and clean up
 - **nia research rules** - integrated nia mcp for external code/docs research and indexing
 - **custom statusline** - git branch, model, and context info
+- **/review command** - two-pass pre-landing PR review (critical + informational) with fix-first handling. auto-fixes mechanical issues, asks about ambiguous ones. scope drift detection, design review for frontend files, doc staleness checks
 
 ## codex harness features
 
@@ -163,9 +164,12 @@ claude-code/
   rules/
     nia.md                  # nia research assistant rules
 
-  commands/
-    commit.md               # /commit - generate commit messages
-    merge.md                # /merge - merge worktree branch and clean up
+  skills/
+    commit/                 # /commit - generate commit messages
+    merge/                  # /merge - merge worktree branch and clean up
+    review/                 # /review - two-pass PR review with fix-first handling
+      SKILL.md              # review workflow
+      checklist.md          # two-pass checklist (critical + informational)
 
 codex/
   config.toml              # model, approval, sandbox, and mcp config
