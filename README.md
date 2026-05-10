@@ -6,7 +6,7 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 
 - **granular bash permissions** - read-only commands auto-allowed, write commands (git add/commit/merge/checkout/worktree) explicitly permitted
 - **sound notifications** - async ping on permission prompts, idle prompts, auth, elicitations, and plan mode responses; glass sound when done
-- **auto-formatting** - biome runs automatically on every file edit/write
+- **auto-formatting** - biome runs automatically when a project has biome config; otherwise prettier runs
 - **auto-linting** - bun lint runs automatically after file changes
 - **git worktree workflow** - auto-creates worktrees for non-trivial tasks to isolate branches across sessions
 - **behavioral guardrails** - assumption surfacing, confusion management, change summaries
