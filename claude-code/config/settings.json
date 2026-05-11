@@ -171,7 +171,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "bunx @biomejs/biome format --write --no-errors-on-unmatched \"$CLAUDE_FILE_PATH\""
+						"command": "f=$(jq -r '.tool_input.file_path // empty' 2>/dev/null); [ -z \"$f\" ] && f=\"$CLAUDE_FILE_PATH\"; [ -z \"$f\" ] && exit 0; case \"$f\" in /*) abs=\"$f\" ;; *) abs=\"$PWD/$f\" ;; esac; dir=$(dirname \"$abs\"); while [ \"$dir\" != \"/\" ] && [ \"$dir\" != \".\" ]; do if [ -f \"$dir/biome.json\" ] || [ -f \"$dir/biome.jsonc\" ]; then cd \"$dir\" && bunx @biomejs/biome format --write --no-errors-on-unmatched \"$abs\"; exit $?; fi; next=$(dirname \"$dir\"); [ \"$next\" = \"$dir\" ] && break; dir=\"$next\"; done; bunx prettier --write \"$abs\""
 					},
 					{
 						"type": "command",
