@@ -34,9 +34,16 @@
 - lowercase only (including the prefix)
 - one-liner describing what was implemented
 - no signatures or co-authored-by lines
+- never add `Co-authored-by: Cursor <cursoragent@cursor.com>` (or any cursor co-author/signature trailer) to commits
 - commit after completing each task
 - commit after each feature
 - commit after each discrete change unit - do not batch unrelated changes into one commit
+
+## pull requests
+
+- name pull requests like a human would: a plain, descriptive title (e.g. "add search to settings page")
+- never prefix branches or pr titles with `cursor/`, `Cursor/`, or any tool/agent name
+- write pr descriptions as a human would, no cursor attribution or signatures
 
 ## behavior
 
