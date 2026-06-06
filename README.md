@@ -91,6 +91,16 @@ use `cursor/mcp.json` as a reference template and merge those entries into `~/.c
 
 restart cursor (or reload mcp servers in settings) after editing.
 
+### cursor cli permissions
+
+`cursor/cli-config.json` is a reference template that grants the cursor cli (cursor-agent) full permissions: every shell command, read, write, web fetch, and mcp tool is auto-allowed with an empty deny list. copy it to `~/.cursor/cli-config.json` (global config):
+
+```bash
+cp cursor/cli-config.json ~/.cursor/cli-config.json
+```
+
+note: this is the persistent equivalent of running with `--force` / `--yolo`. only the cursor cli reads `cli-config.json`; the cursor ide app has its own auto-run setting in the app settings ui.
+
 ### codex cli setup
 
 from the `harness-configs` directory, symlink these files to `~/.codex/`:
@@ -205,6 +215,7 @@ claude-code/
 
 cursor/
   mcp.json                 # reference MCP server entries (github, nia) for ~/.cursor/mcp.json
+  cli-config.json          # reference cursor-agent config granting full permissions for ~/.cursor/cli-config.json
 
 codex/
   config.toml              # model, approval, sandbox, and mcp config

@@ -1,8 +1,8 @@
 model = "gpt-5.4"
 model_reasoning_effort = "xhigh"
 personality = "pragmatic"
-approval_policy = "on-request"
-sandbox_mode = "workspace-write"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
 
 [mcp_servers.github]
 command = "npx"
@@ -17,3 +17,7 @@ env = { NIA_API_KEY = "${NIA_API_KEY}", NIA_API_URL = "https://apigcp.trynia.ai/
 [features]
 multi_agent = true
 goals = true
+
+# preempt the full access warning prompt since we always run with full access
+[notice]
+hide_full_access_warning = true

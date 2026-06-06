@@ -1,226 +1,227 @@
 {
-	"permissions": {
-		"allow": [
-			"Read",
-			"Glob",
-			"Grep",
-			"LSP",
-			"WebFetch",
-			"WebSearch",
-			"Task",
-			"Bash(cat:*)",
-			"Bash(ls:*)",
-			"Bash(find:*)",
-			"Bash(which:*)",
-			"Bash(head:*)",
-			"Bash(tail:*)",
-			"Bash(wc:*)",
-			"Bash(file:*)",
-			"Bash(stat:*)",
-			"Bash(tree:*)",
-			"Bash(pwd:*)",
-			"Bash(echo:*)",
-			"Bash(grep:*)",
-			"Bash(rg:*)",
-			"Bash(fd:*)",
-			"Bash(basename:*)",
-			"Bash(dirname:*)",
-			"Bash(realpath:*)",
-			"Bash(readlink:*)",
-			"Bash(cd:*)",
-			"Bash(printf:*)",
-			"Bash(jq:*)",
-			"Bash(yq:*)",
-			"Bash(diff:*)",
-			"Bash(sort:*)",
-			"Bash(uniq:*)",
-			"Bash(cut:*)",
-			"Bash(tr:*)",
-			"Bash(awk:*)",
-			"Bash(sed:*)",
-			"Bash(env:*)",
-			"Bash(printenv:*)",
-			"Bash(whoami:*)",
-			"Bash(hostname:*)",
-			"Bash(date:*)",
-			"Bash(uname:*)",
-			"Bash(id:*)",
-			"Bash(type:*)",
-			"Bash(command:*)",
-			"Bash(test:*)",
-			"Bash([:*)",
-			"Bash(du:*)",
-			"Bash(df:*)",
-			"Bash(ps:*)",
-			"Bash(pgrep:*)",
-			"Bash(lsof:*)",
-			"Bash(xattr:*)",
-			"Bash(mdls:*)",
-			"Bash(mdfind:*)",
-			"Bash(curl:*)",
-			"Bash(gh:*)",
-			"Bash(brew:*)",
-			"Bash(git:*)",
-			"Bash(npm:*)",
-			"Bash(bun:*)",
-			"Bash(node:*)",
-			"Bash(python:*)",
-			"Bash(python3:*)",
-			"Bash(pip:*)",
-			"Bash(pip3:*)",
-			"Bash(uv:*)",
-			"Bash(cargo:*)",
-			"Bash(rustc:*)",
-			"Bash(go:*)",
-			"Bash(docker:*)",
-			"mcp__github__get_file_contents",
-			"mcp__github__get_issue",
-			"mcp__github__get_pull_request",
-			"mcp__github__get_pull_request_files",
-			"mcp__github__get_pull_request_status",
-			"mcp__github__get_pull_request_comments",
-			"mcp__github__get_pull_request_reviews",
-			"mcp__github__list_commits",
-			"mcp__github__list_issues",
-			"mcp__github__list_pull_requests",
-			"mcp__github__search_repositories",
-			"mcp__github__search_code",
-			"mcp__github__search_issues",
-			"mcp__github__search_users",
-			"mcp__ide__getDiagnostics",
-			"mcp__nia__search",
-			"mcp__nia__manage_resource",
-			"mcp__nia__nia_read",
-			"mcp__nia__nia_grep",
-			"mcp__nia__nia_explore",
-			"mcp__nia__nia_research",
-			"mcp__nia__nia_package_search_hybrid",
-			"mcp__nia__context",
-			"mcp__nia__index"
-		],
-		"deny": [],
-		"defaultMode": "auto"
-	},
-	"hooks": {
-		"Notification": [
-			{
-				"matcher": "permission_prompt",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Ping.aiff",
-						"async": true
-					}
-				]
-			},
-			{
-				"matcher": "idle_prompt",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Ping.aiff",
-						"async": true
-					}
-				]
-			},
-			{
-				"matcher": "auth_success",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Ping.aiff",
-						"async": true
-					}
-				]
-			},
-			{
-				"matcher": "elicitation_dialog",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Ping.aiff",
-						"async": true
-					}
-				]
-			},
-			{
-				"matcher": "plan_mode_response",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Ping.aiff",
-						"async": true
-					}
-				]
-			}
-		],
-		"PermissionRequest": [
-			{
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Ping.aiff",
-						"async": true
-					}
-				]
-			}
-		],
-		"PostToolUse": [
-			{
-				"matcher": "Edit|Write",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "f=$(jq -r '.tool_input.file_path // empty' 2>/dev/null); [ -z \"$f\" ] && f=\"$CLAUDE_FILE_PATH\"; [ -z \"$f\" ] && exit 0; case \"$f\" in /*) abs=\"$f\" ;; *) abs=\"$PWD/$f\" ;; esac; dir=$(dirname \"$abs\"); while [ \"$dir\" != \"/\" ] && [ \"$dir\" != \".\" ]; do if [ -f \"$dir/biome.json\" ] || [ -f \"$dir/biome.jsonc\" ]; then cd \"$dir\" && bunx @biomejs/biome format --write --no-errors-on-unmatched \"$abs\"; exit $?; fi; next=$(dirname \"$dir\"); [ \"$next\" = \"$dir\" ] && break; dir=\"$next\"; done; bunx prettier --write \"$abs\""
-					},
-					{
-						"type": "command",
-						"command": "[ -f bun.lockb ] && grep -q '\"lint\"' package.json 2>/dev/null && bun run lint 2>/dev/null || true"
-					}
-				]
-			}
-		],
-		"Stop": [
-			{
-				"hooks": [
-					{
-						"type": "command",
-						"command": "afplay /System/Library/Sounds/Glass.aiff",
-						"async": true
-					}
-				]
-			},
-			{
-				"matcher": "",
-				"hooks": [
-					{
-						"type": "command",
-						"command": "python3 /Users/tomzheng/Documents/coding/claude-goal/goal/scripts/claude_goal.py stop-hook"
-					}
-				]
-			}
-		]
-	},
-	"statusLine": {
-		"type": "command",
-		"command": "~/.claude/statusline-command.sh"
-	},
-	"enabledPlugins": {
-		"codex@openai-codex": true,
-		"frontend-design@claude-plugins-official": true,
-		"swift-lsp@claude-plugins-official": true
-	},
-	"extraKnownMarketplaces": {
-		"openai-codex": {
-			"source": {
-				"source": "github",
-				"repo": "openai/codex-plugin-cc"
-			}
-		}
-	},
-	"fastMode": true,
-	"theme": "light",
-	"verbose": true,
-	"agentPushNotifEnabled": false,
-	"skipAutoPermissionPrompt": true
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "LSP",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(which:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(tree:*)",
+      "Bash(pwd:*)",
+      "Bash(echo:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(fd:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+      "Bash(realpath:*)",
+      "Bash(readlink:*)",
+      "Bash(cd:*)",
+      "Bash(printf:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(diff:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(tr:*)",
+      "Bash(awk:*)",
+      "Bash(sed:*)",
+      "Bash(env:*)",
+      "Bash(printenv:*)",
+      "Bash(whoami:*)",
+      "Bash(hostname:*)",
+      "Bash(date:*)",
+      "Bash(uname:*)",
+      "Bash(id:*)",
+      "Bash(type:*)",
+      "Bash(command:*)",
+      "Bash(test:*)",
+      "Bash([:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(ps:*)",
+      "Bash(pgrep:*)",
+      "Bash(lsof:*)",
+      "Bash(xattr:*)",
+      "Bash(mdls:*)",
+      "Bash(mdfind:*)",
+      "Bash(curl:*)",
+      "Bash(gh:*)",
+      "Bash(brew:*)",
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(bun:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(uv:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(go:*)",
+      "Bash(docker:*)",
+      "mcp__github__get_file_contents",
+      "mcp__github__get_issue",
+      "mcp__github__get_pull_request",
+      "mcp__github__get_pull_request_files",
+      "mcp__github__get_pull_request_status",
+      "mcp__github__get_pull_request_comments",
+      "mcp__github__get_pull_request_reviews",
+      "mcp__github__list_commits",
+      "mcp__github__list_issues",
+      "mcp__github__list_pull_requests",
+      "mcp__github__search_repositories",
+      "mcp__github__search_code",
+      "mcp__github__search_issues",
+      "mcp__github__search_users",
+      "mcp__ide__getDiagnostics",
+      "mcp__nia__search",
+      "mcp__nia__manage_resource",
+      "mcp__nia__nia_read",
+      "mcp__nia__nia_grep",
+      "mcp__nia__nia_explore",
+      "mcp__nia__nia_research",
+      "mcp__nia__nia_package_search_hybrid",
+      "mcp__nia__context",
+      "mcp__nia__index"
+    ],
+    "deny": [],
+    "defaultMode": "bypassPermissions"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "auth_success",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "plan_mode_response",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty' 2>/dev/null); [ -z \"$f\" ] && f=\"$CLAUDE_FILE_PATH\"; [ -z \"$f\" ] && exit 0; case \"$f\" in /*) abs=\"$f\" ;; *) abs=\"$PWD/$f\" ;; esac; dir=$(dirname \"$abs\"); while [ \"$dir\" != \"/\" ] && [ \"$dir\" != \".\" ]; do if [ -f \"$dir/biome.json\" ] || [ -f \"$dir/biome.jsonc\" ]; then cd \"$dir\" && bunx @biomejs/biome format --write --no-errors-on-unmatched \"$abs\"; exit $?; fi; next=$(dirname \"$dir\"); [ \"$next\" = \"$dir\" ] && break; dir=\"$next\"; done; bunx prettier --write \"$abs\""
+          },
+          {
+            "type": "command",
+            "command": "[ -f bun.lockb ] && grep -q '\"lint\"' package.json 2>/dev/null && bun run lint 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Glass.aiff",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/tomzheng/Documents/coding/claude-goal/goal/scripts/claude_goal.py stop-hook"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "codex@openai-codex": true,
+    "frontend-design@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
+  },
+  "fastMode": true,
+  "theme": "light",
+  "verbose": true,
+  "agentPushNotifEnabled": false,
+  "skipAutoPermissionPrompt": true,
+  "skipDangerousModePermissionPrompt": true
 }
