@@ -1,0 +1,19 @@
+{
+	"mcpServers": {
+		"github": {
+			"command": "npx",
+			"args": ["-y", "@modelcontextprotocol/server-github"],
+			"env": {
+				"GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+			}
+		},
+		"nia": {
+			"command": "pipx",
+			"args": ["run", "--no-cache", "nia-mcp-server"],
+			"env": {
+				"NIA_API_KEY": "${NIA_API_KEY}",
+				"NIA_API_URL": "https://apigcp.trynia.ai/"
+			}
+		}
+	}
+}

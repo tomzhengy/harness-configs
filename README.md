@@ -80,6 +80,17 @@ set +a
 
 use `claude-code/config/mcp.json` as a reference template and merge those entries into `~/.claude.json` with your API keys. the gpu bootstrap script handles this merge automatically.
 
+### cursor mcp servers
+
+use `cursor/mcp.json` as a reference template and merge those entries into `~/.cursor/mcp.json` with your API keys (github + nia, the same two servers as the claude config). cursor does not expand `${VAR}` placeholders, so replace them with real values in the live file:
+
+```bash
+# edit ~/.cursor/mcp.json and add the github + nia entries from cursor/mcp.json,
+# substituting your GITHUB_PERSONAL_ACCESS_TOKEN and NIA_API_KEY
+```
+
+restart cursor (or reload mcp servers in settings) after editing.
+
 ### codex cli setup
 
 from the `harness-configs` directory, symlink these files to `~/.codex/`:
@@ -191,6 +202,9 @@ claude-code/
     review/                 # /review - two-pass PR review with fix-first handling
       SKILL.md              # review workflow
       checklist.md          # two-pass checklist (critical + informational)
+
+cursor/
+  mcp.json                 # reference MCP server entries (github, nia) for ~/.cursor/mcp.json
 
 codex/
   config.toml              # model, approval, sandbox, and mcp config
