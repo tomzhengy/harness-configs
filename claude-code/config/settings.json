@@ -219,6 +219,7 @@
     }
   },
   "fastMode": true,
+  "ultracode": true,
   "theme": "light",
   "verbose": true,
   "agentPushNotifEnabled": false,
