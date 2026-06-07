@@ -33,8 +33,8 @@
 - use conventional commit prefixes: feat, fix, docs, refactor, chore, test, style
 - lowercase only (including the prefix)
 - one-liner describing what was implemented
-- no signatures or co-authored-by lines
-- never add `Co-authored-by: Cursor <cursoragent@cursor.com>` (or any cursor co-author/signature trailer) to commits
+- no signatures, co-authored-by lines, generated-by lines, or agent attribution
+- never add any co-author or tool signature trailer, including `Co-authored-by: ...`
 - commit after completing each task
 - commit after each feature
 - commit after each discrete change unit - do not batch unrelated changes into one commit
@@ -42,8 +42,8 @@
 ## pull requests
 
 - name pull requests like a human would: a plain, descriptive title (e.g. "add search to settings page")
-- never prefix branches or pr titles with `cursor/`, `Cursor/`, or any tool/agent name
-- write pr descriptions as a human would, no cursor attribution or signatures
+- never prefix branches or pr titles with `codex/`, `cursor/`, `claude/`, or any other tool/agent name
+- write pr descriptions as a human would, no co-authors, generated-by text, tool attribution, or signatures
 
 ## behavior
 
@@ -100,7 +100,7 @@ after editing code:
 when starting a non-trivial task (not config tweaks, not quick fixes):
 
 1. determine a short descriptive name from the task (e.g., `auth-fix`, `add-search`)
-2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b codex/<name>`
+2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b <name>`
 3. cd into the new worktree directory
 4. do all work there
 5. when done, tell the user the branch name and worktree path
