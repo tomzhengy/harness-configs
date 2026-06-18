@@ -164,6 +164,12 @@ install_file "$SRC_DIR/config/statusline-command.sh" "$CLAUDE_DIR/statusline-com
 chmod +x "$CLAUDE_DIR/statusline-command.sh"
 echo ""
 
+# --- expose-worktrees.sh (SessionStart hook) ---
+echo "expose-worktrees.sh:"
+install_file "$SRC_DIR/config/expose-worktrees.sh" "$CLAUDE_DIR/expose-worktrees.sh"
+chmod +x "$CLAUDE_DIR/expose-worktrees.sh"
+echo ""
+
 # --- rules ---
 echo "rules:"
 if [ "$MODE" = "link" ]; then
