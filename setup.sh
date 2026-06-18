@@ -120,6 +120,48 @@ else
 fi
 echo ""
 
+# --- keybindings.json ---
+echo "keybindings.json:"
+TARGET_KEYBINDINGS="$CLAUDE_DIR/keybindings.json"
+SOURCE_KEYBINDINGS="$SRC_DIR/config/keybindings.json"
+
+if [ "$MODE" = "link" ]; then
+    backup_file "$TARGET_KEYBINDINGS"
+    rm -f "$TARGET_KEYBINDINGS"
+    ln -sf "$SOURCE_KEYBINDINGS" "$TARGET_KEYBINDINGS"
+    echo "  linked keybindings.json"
+elif [ ! -f "$TARGET_KEYBINDINGS" ]; then
+    cp "$SOURCE_KEYBINDINGS" "$TARGET_KEYBINDINGS"
+    echo "  copied keybindings.json (new install)"
+else
+    backup_file "$TARGET_KEYBINDINGS"
+    jq -s '
+        .[0] as $base | .[1] as $patch |
+
+        # collect bindings blocks from each
+        ([$base.bindings[]?]) as $bb |
+        ([$patch.bindings[]?]) as $pb |
+
+        # union of contexts, base order first then any new patch contexts
+        (([$bb[].context] + [$pb[].context]) | unique) as $ctxs |
+
+        # base * patch for top-level scalars (schema/docs), then rebuild bindings
+        ($base * $patch) |
+        .bindings = [ $ctxs[] as $c |
+            {
+                context: $c,
+                bindings: (
+                    (($bb | map(select(.context == $c)) | .[0].bindings) // {}) *
+                    (($pb | map(select(.context == $c)) | .[0].bindings) // {})
+                )
+            }
+        ]
+    ' "$TARGET_KEYBINDINGS" "$SOURCE_KEYBINDINGS" > "$TARGET_KEYBINDINGS.tmp" \
+        && mv "$TARGET_KEYBINDINGS.tmp" "$TARGET_KEYBINDINGS"
+    echo "  merged into existing keybindings.json"
+fi
+echo ""
+
 # --- CLAUDE.md ---
 echo "CLAUDE.md:"
 TARGET_CLAUDE="$CLAUDE_DIR/CLAUDE.md"
