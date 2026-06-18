@@ -191,6 +191,22 @@ this installs everything and sets up config. it's idempotent so you can run it a
 - macOS-only hooks (afplay sounds, swift-lsp) are auto-stripped from settings.json
 - `settings.json` is generated (not symlinked) so linux-incompatible entries don't break things
 
+### clipaste (paste images into claude code over ssh)
+
+claude code can't paste clipboard images when it runs on a remote machine over ssh -
+the clipboard is local and ssh doesn't forward it. [clipaste](https://github.com/hqhq1025/clipaste)
+bridges your local clipboard to the remote. run this on your **local** mac (the one
+with the clipboard), not the remote:
+
+```bash
+cd clipaste
+./setup-local.sh user@remote-host        # add -p PORT for a non-default ssh port
+```
+
+on a macos remote, paste with the `clipaste-paste` helper inside the remote claude
+code session (it prints an image path to reference). see `clipaste/README.md` for
+details, verification, and a no-daemon fallback.
+
 ## structure
 
 ```
@@ -235,4 +251,8 @@ gpu-setup/
   Dockerfile                # runpod pytorch gpu environment
   bootstrap.sh              # system setup script
   entrypoint.sh             # container entrypoint
+
+clipaste/
+  setup-local.sh           # local-side installer for clipboard image paste over ssh
+  README.md                # clipaste setup, usage on a macos remote, and fallback
 ```
