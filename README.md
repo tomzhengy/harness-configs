@@ -13,7 +13,6 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **systems-first design** - iterates on system design before writing code
 - **nia research rules** - integrated nia mcp for external code/docs research and indexing
 - **custom statusline** - git branch, model, and context info
-- **/review command** - two-pass pre-landing PR review (critical + informational) with fix-first handling. auto-fixes mechanical issues, asks about ambiguous ones. scope drift detection, design review for frontend files, doc staleness checks
 
 ## codex harness features
 
@@ -219,11 +218,6 @@ claude-code/
 
   rules/
     nia.md                  # nia research assistant rules
-
-  skills/
-    review/                 # /review - two-pass PR review with fix-first handling
-      SKILL.md              # review workflow
-      checklist.md          # two-pass checklist (critical + informational)
 
 cursor/
   mcp.json                 # reference MCP server entries (github, nia) for ~/.cursor/mcp.json
