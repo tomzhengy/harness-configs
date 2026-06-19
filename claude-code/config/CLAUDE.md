@@ -89,7 +89,7 @@ CONCERNS:
 when starting a non-trivial task (not config tweaks, not quick fixes):
 
 1. determine a short descriptive name from the task (e.g., `auth-fix`, `add-search`)
-2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b claude/<name>`
+2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b <name>` (plain branch name, no `claude/` prefix)
 3. cd into the new worktree directory
 4. do all work there
 5. when done, tell the user the branch name and worktree path
