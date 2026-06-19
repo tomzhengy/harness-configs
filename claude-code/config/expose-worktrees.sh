@@ -6,8 +6,48 @@
 # dir named <repo>-<name>, so it shows in the editor sidebar next to the repo
 # like a normal sibling folder. dead symlinks (worktree already cleaned up by
 # claude) are pruned. the real worktree stays in .claude/worktrees, so claude's
-# own auto-cleanup keeps working. runs on SessionStart; must print nothing to
-# stdout (SessionStart stdout is injected into the session context).
+# own auto-cleanup keeps working. nested-repo workspaces are handled too: if the
+# session resolves to an umbrella repo (e.g. freesolo-co) whose worktrees live in
+# a child repo (freesolo-co/freesolo/.claude/worktrees), the child's worktrees are
+# surfaced as <child>-<name> siblings inside the umbrella. runs on SessionStart;
+# must print nothing to stdout (SessionStart stdout is injected into the session
+# context).
+
+# expose one repo's worktrees as <repo>-<name> symlinks in its parent dir.
+expose_repo() {
+  repo="$1"
+  rp=$(dirname "$repo")
+  rn=$(basename "$repo")
+  wtdir="$repo/.claude/worktrees"
+  [ "$rp" = "$repo" ] && return
+  [ -d "$rp" ] || return
+
+  # 1) create a sibling symlink for each real worktree (skip throwaway agent-* ones)
+  if [ -d "$wtdir" ]; then
+    for path in "$wtdir"/*/; do
+      [ -d "$path" ] || continue
+      name=$(basename "$path")
+      case "$name" in agent-*) continue ;; esac
+      link="$rp/$rn-$name"
+      if [ ! -e "$link" ] && [ ! -L "$link" ]; then
+        ln -s "$rn/.claude/worktrees/$name" "$link" 2>/dev/null
+      fi
+    done
+  fi
+
+  # 2) prune sibling symlinks whose worktree is gone. only ever touches symlinks
+  #    that point into .claude/worktrees (never real dirs like sibling projects or
+  #    manually-made worktrees)
+  for link in "$rp/$rn-"*; do
+    [ -L "$link" ] || continue
+    target=$(readlink "$link" 2>/dev/null)
+    case "$target" in
+      */.claude/worktrees/*) ;;
+      *) continue ;;
+    esac
+    [ -e "$link" ] || rm "$link" 2>/dev/null
+  done
+}
 
 # read cwd from the hook's stdin json if present, else fall back to $PWD
 input=""
@@ -25,36 +65,15 @@ case "$gitdir" in
 esac
 [ -d "$mainrepo" ] || exit 0
 
-parent=$(dirname "$mainrepo")
-reponame=$(basename "$mainrepo")
-wtdir="$mainrepo/.claude/worktrees"
-[ "$parent" = "$mainrepo" ] && exit 0
-[ -d "$parent" ] || exit 0
+# expose the resolved repo's own worktrees
+expose_repo "$mainrepo"
 
-# 1) create a sibling symlink for each real worktree (skip throwaway agent-* ones)
-if [ -d "$wtdir" ]; then
-  for path in "$wtdir"/*/; do
-    [ -d "$path" ] || continue
-    name=$(basename "$path")
-    case "$name" in agent-*) continue ;; esac
-    link="$parent/$reponame-$name"
-    if [ ! -e "$link" ] && [ ! -L "$link" ]; then
-      ln -s "$reponame/.claude/worktrees/$name" "$link" 2>/dev/null
-    fi
-  done
-fi
-
-# 2) prune sibling symlinks whose worktree is gone. only ever touches symlinks
-#    that point into <repo>/.claude/worktrees (never real dirs like the repo's
-#    other sibling projects or manually-made worktrees)
-for link in "$parent/$reponame-"*; do
-  [ -L "$link" ] || continue
-  target=$(readlink "$link" 2>/dev/null)
-  case "$target" in
-    */.claude/worktrees/*) ;;
-    *) continue ;;
-  esac
-  [ -e "$link" ] || rm "$link" 2>/dev/null
+# also expose worktrees of immediate child repos. handles nested-repo workspaces
+# where the session resolves to an umbrella repo but the worktrees belong to a
+# child repo one level down (e.g. freesolo-co -> freesolo).
+for child in "$mainrepo"/*/; do
+  [ -d "${child}.claude/worktrees" ] || continue
+  expose_repo "${child%/}"
 done
 
 exit 0
