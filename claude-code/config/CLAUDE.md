@@ -17,6 +17,12 @@
 - use uv for everything: uv run, uv pip, uv venv
 - use `hf` cli instead of `huggingface-cli` (deprecated)
 
+## clipboard
+
+- clipaste bridges my local mac clipboard to this host over the ssh tunnel. when i say "look at my clipboard", "check my clipboard", "what did i copy", "paste this", or anything similar, run `clipaste-paste`, take the path it prints, and Read that file (usually an image).
+- if it reports "no image on clipboard", tell me to screenshot or copy an image first. do not guess.
+- never trust a path i paste as plain text via cmd+v (e.g. `/Users/.../.cache/clipaste/shot-*.png`). that is my local mac's path and this host cannot read it. always re-fetch with `clipaste-paste` instead.
+
 ## bash
 
 - avoid commands that cause output buffering issues
@@ -116,6 +122,7 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 - don't add features that weren't requested (but you can suggest them)
 - don't refactor unrelated code
 - don't add documentation unless asked
+- never merge prs for me. this covers `gh pr merge`, the github mcp merge tool, auto-merge, and the `/merge` skill. you can open prs, push commits, and tell me they are ready to merge, but i always do the final merge myself. if you think a merge is needed, ask.
 
 ## principles
 

@@ -184,7 +184,8 @@ else
     backup_file "$TARGET_CLAUDE"
     # strip existing harness-configs block if present
     if grep -qF "$MARKER" "$TARGET_CLAUDE"; then
-        sed -i.bak "/$MARKER/,/$END_MARKER/d" "$TARGET_CLAUDE"
+        # use | as the sed address delimiter since END_MARKER contains a /
+        sed -i.bak "\|$MARKER|,\|$END_MARKER|d" "$TARGET_CLAUDE"
         rm -f "$TARGET_CLAUDE.bak"
         echo "  replaced existing harness-configs block"
     else
