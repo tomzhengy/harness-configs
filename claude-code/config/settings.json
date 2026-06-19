@@ -189,15 +189,6 @@
             "async": true
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/tomzheng/Documents/coding/claude-goal/goal/scripts/claude_goal.py stop-hook"
-          }
-        ]
       }
     ]
   },
