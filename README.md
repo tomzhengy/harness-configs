@@ -11,17 +11,14 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **git worktree workflow** - auto-creates worktrees for non-trivial tasks to isolate branches across sessions
 - **behavioral guardrails** - assumption surfacing, confusion management, change summaries
 - **systems-first design** - iterates on system design before writing code
-- **/commit command** - auto-generate commit messages from git changes
-- **/merge command** - merge a worktree branch back into the target branch and clean up
 - **nia research rules** - integrated nia mcp for external code/docs research and indexing
 - **custom statusline** - git branch, model, and context info
-- **/review command** - two-pass pre-landing PR review (critical + informational) with fix-first handling. auto-fixes mechanical issues, asks about ambiguous ones. scope drift detection, design review for frontend files, doc staleness checks
 
 ## codex harness features
 
 - **instruction parity** - codex `AGENTS.md` mirrors the current claude workflow rules: bun-first js/ts, assumption surfacing, worktree workflow, post-edit checks, and nia-first research
 - **broad command rules** - codex `rules/default.rules` mirrors the current claude command-family allowlist rather than the older tighter readme wording
-- **skill-based workflow ports** - local skills replace the claude plan agent and the `/commit` and `/merge` commands
+- **skill-based workflow ports** - local skills cover planning, commit messages, worktree merges, code review, and nia research
 - **explicit native gaps** - codex does not currently replicate claude's sound notifications, custom statusline scripting, edit-triggered hooks, or swift plugin support in this repo
 
 ## installation
@@ -221,13 +218,6 @@ claude-code/
 
   rules/
     nia.md                  # nia research assistant rules
-
-  skills/
-    commit/                 # /commit - generate commit messages
-    merge/                  # /merge - merge worktree branch and clean up
-    review/                 # /review - two-pass PR review with fix-first handling
-      SKILL.md              # review workflow
-      checklist.md          # two-pass checklist (critical + informational)
 
 cursor/
   mcp.json                 # reference MCP server entries (github, nia) for ~/.cursor/mcp.json

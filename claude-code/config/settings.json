@@ -181,7 +181,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // empty' 2>/dev/null); [ -z \"$f\" ] && f=\"$CLAUDE_FILE_PATH\"; [ -z \"$f\" ] && exit 0; case \"$f\" in /*) abs=\"$f\" ;; *) abs=\"$PWD/$f\" ;; esac; dir=$(dirname \"$abs\"); while [ \"$dir\" != \"/\" ] && [ \"$dir\" != \".\" ]; do if [ -f \"$dir/biome.json\" ] || [ -f \"$dir/biome.jsonc\" ]; then cd \"$dir\" && bunx @biomejs/biome format --write --no-errors-on-unmatched \"$abs\"; exit $?; fi; next=$(dirname \"$dir\"); [ \"$next\" = \"$dir\" ] && break; dir=\"$next\"; done; bunx prettier --write \"$abs\""
+            "command": "f=$(jq -r '.tool_input.file_path // empty' 2>/dev/null); [ -z \"$f\" ] && f=\"$CLAUDE_FILE_PATH\"; [ -z \"$f\" ] && exit 0; case \"$f\" in /*) abs=\"$f\" ;; *) abs=\"$PWD/$f\" ;; esac; dir=$(dirname \"$abs\"); while [ \"$dir\" != \"/\" ] && [ \"$dir\" != \".\" ]; do if [ -f \"$dir/biome.json\" ] || [ -f \"$dir/biome.jsonc\" ]; then cd \"$dir\" && bunx @biomejs/biome format --write --no-errors-on-unmatched \"$abs\"; exit $?; fi; next=$(dirname \"$dir\"); [ \"$next\" = \"$dir\" ] && break; dir=\"$next\"; done; bunx prettier --write --ignore-unknown \"$abs\""
           },
           {
             "type": "command",
@@ -197,15 +197,6 @@
             "type": "command",
             "command": "afplay /System/Library/Sounds/Glass.aiff",
             "async": true
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/tomzheng/Documents/coding/claude-goal/goal/scripts/claude_goal.py stop-hook"
           }
         ]
       }
