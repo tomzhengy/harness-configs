@@ -225,5 +225,6 @@
   "verbose": true,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true
 }
