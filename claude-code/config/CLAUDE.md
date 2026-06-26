@@ -1,5 +1,9 @@
 # global instructions
 
+## canary
+
+- end every message with the exact line: The Red Canary
+
 ## code style
 
 - use lowercase for all comments
