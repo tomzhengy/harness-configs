@@ -128,6 +128,23 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 - don't add documentation unless asked
 - never merge prs for me. this covers `gh pr merge`, the github mcp merge tool, auto-merge, and the `/merge` skill. you can open prs, push commits, and tell me they are ready to merge, but i always do the final merge myself. if you think a merge is needed, ask.
 
+## pr monitoring
+
+- trigger: when you open a pr, you own monitoring it until i merge or close it. only the agent that opened the pr watches it - do not start a second loop for a pr already being watched.
+- start a recurring watcher on that pr: `/loop 15m <monitor task>`. keep the cadence literal - one scan every 15 minutes.
+- each cycle, spawn a `/fork` agent (inherits full context: branch, diff, original intent) to scan the pr and handle what it finds.
+- watch for and respond to:
+  - merge conflicts: rebase or merge the base branch into your branch, resolve, push.
+  - ci failures (`gh pr checks`): read the failing logs, fix the cause, push.
+  - review comments from bugbot, codex, and other review bots/reviewers: address the feedback in code, push.
+- push all fixes to the pr branch. never open a new pr for the same work.
+- when you make a change for a comment or review thread, reply directly on that exact thread explaining what changed and why (`gh pr comment` for pr-level, `gh api` for inline review threads).
+- reply once per resolved item - track what is already handled so you do not double-respond.
+- if a comment is unclear or you disagree, reply asking for clarification instead of guessing.
+- if nothing is actionable this cycle, do nothing and wait for the next one.
+- never merge the pr. the loop only fixes, pushes, and replies - i do the final merge. this loop is bound by the never-merge rule above (no `gh pr merge`, no auto-merge, no `/merge`).
+- stop the loop once the pr is merged or closed. check state each cycle and exit cleanly, leaving no loop running.
+
 ## principles
 
 ### research
