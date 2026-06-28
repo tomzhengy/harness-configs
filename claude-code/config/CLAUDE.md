@@ -130,20 +130,30 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 
 ## pr monitoring
 
-- trigger: when you open a pr, you own monitoring it until i merge or close it. only the agent that opened the pr watches it - do not start a second loop for a pr already being watched.
-- start a recurring watcher on that pr: `/loop 15m <monitor task>`. keep the cadence literal - one scan every 15 minutes.
-- each cycle, spawn a `/fork` agent (inherits full context: branch, diff, original intent) to scan the pr and handle what it finds.
-- watch for and respond to:
-  - merge conflicts: rebase or merge the base branch into your branch, resolve, push.
-  - ci failures (`gh pr checks`): read the failing logs, fix the cause, push.
-  - review comments from bugbot, codex, and other review bots/reviewers: address the feedback in code, push.
-- push all fixes to the pr branch. never open a new pr for the same work.
-- when you make a change for a comment or review thread, reply directly on that exact thread explaining what changed and why (`gh pr comment` for pr-level, `gh api` for inline review threads).
-- reply once per resolved item - track what is already handled so you do not double-respond.
-- if a comment is unclear or you disagree, reply asking for clarification instead of guessing.
-- if nothing is actionable this cycle, do nothing and wait for the next one.
-- never merge the pr. the loop only fixes, pushes, and replies - i do the final merge. this loop is bound by the never-merge rule above (no `gh pr merge`, no auto-merge, no `/merge`).
-- stop the loop once the pr is merged or closed. check state each cycle and exit cleanly, leaving no loop running.
+- when you open a pr, you own monitoring it in this session until i merge or close it. one watcher per pr.
+- every 15 minutes (`/loop 15m`), spawn one `/fork` agent. the fork inherits full context (branch, diff, original intent), scans the pr, and fixes what it finds while it still has that context. the main agent never scans - its only job each tick is to update the findings table below. this keeps the fork's noisy work out of the main session.
+- the fork handles each item directly, then reports it back in one line:
+  - merge conflicts: rebase the base branch in, resolve, push.
+  - ci failures: read the logs, fix the cause, push.
+  - review comments from bugbot, codex, and other reviewers: fix in code, push, reply on the thread explaining the change, and resolve it.
+- the findings table in the chat is the single record of what happened:
+  - fork found and handled something: add a row - time, what it found, what it did, status.
+  - fork found nothing: add no row, just update the run counter under the table. the counter tracks total scans and the last run time.
+- keep the table tight so i can scan it when i come back. do not paste fork output into the chat - it goes in the table.
+
+table format:
+
+| time  | found             | action                     | status |
+| ----- | ----------------- | -------------------------- | ------ |
+| 14:05 | ci: lint failed   | fixed import order, pushed | green  |
+| 14:50 | codex: naming nit | renamed, replied, resolved | done   |
+
+scans run: 7 (last 15:35, nothing new since 14:50)
+
+- never open a new pr for the same work; push all fixes to the pr branch.
+- never merge the pr. the watcher only fixes, pushes, and replies - i do the final merge. bound by the never-merge rule above (no `gh pr merge`, no auto-merge, no `/merge`).
+- never use `/autofix-pr` or other cloud pr watchers. keep monitoring in-session with `/fork`.
+- stop monitoring once the pr is merged or closed.
 
 ## principles
 
