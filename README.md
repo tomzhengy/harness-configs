@@ -18,8 +18,11 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 
 - **instruction parity** - codex `AGENTS.md` mirrors the current claude workflow rules: bun-first js/ts, assumption surfacing, worktree workflow, post-edit checks, and nia-first research
 - **broad command rules** - codex `rules/default.rules` mirrors the current claude command-family allowlist rather than the older tighter readme wording
+- **hook parity** - codex `hooks.json` ports worktree exposure, permission/stop sounds, and post-edit format/lint hooks using codex's native hook system
+- **portable mcp startup** - codex mcp config uses `bunx` for github, `uvx` for nia, and documented env forwarding instead of hard-coded local binary paths
 - **skill-based workflow ports** - local skills cover planning, commit messages, worktree merges, code review, and nia research
-- **explicit native gaps** - codex does not currently replicate claude's sound notifications, custom statusline scripting, edit-triggered hooks, or swift plugin support in this repo
+- **strict review skill** - codex includes the thermo-nuclear code quality review skill from the claude setup as an explicit/manual skill
+- **explicit native gaps** - codex does not currently replicate claude's custom statusline scripting, transcript scroll keybinding, or claude-only plugin marketplace entries in this repo
 
 ## installation
 
@@ -100,17 +103,40 @@ note: this is the persistent equivalent of running with `--force` / `--yolo`. on
 
 ### codex cli setup
 
-from the `harness-configs` directory, symlink these files to `~/.codex/`:
+from the `harness-configs` directory, run:
+
+```bash
+./codex/setup.sh --link
+```
+
+copy mode is the default if you do not want symlinks:
+
+```bash
+./codex/setup.sh
+```
+
+the script installs codex config, global instructions, rules, and hooks under
+`CODEX_HOME` (default `~/.codex`). skills are installed under the current
+documented user-skill path, `~/.agents/skills`. if your local codex build still
+loads personal skills from `~/.codex/skills`, override the target:
+
+```bash
+CODEX_SKILLS_DIR="$HOME/.codex/skills" ./codex/setup.sh --link
+```
+
+manual symlink equivalent:
 
 ```bash
 mkdir -p ~/.codex
-mkdir -p ~/.codex/skills
+mkdir -p ~/.agents/skills
 ln -sf $(pwd)/codex/config.toml ~/.codex/config.toml
 ln -sf $(pwd)/codex/AGENTS.md ~/.codex/AGENTS.md
 ln -sf $(pwd)/codex/instructions.md ~/.codex/instructions.md
+ln -sf $(pwd)/codex/hooks.json ~/.codex/hooks.json
 ln -sfn $(pwd)/codex/rules ~/.codex/rules
+ln -sfn $(pwd)/codex/hooks ~/.codex/hooks
 for skill in codex/skills/*; do
-  ln -sfn "$(pwd)/$skill" ~/.codex/skills/"$(basename "$skill")"
+  ln -sfn "$(pwd)/$skill" ~/.agents/skills/"$(basename "$skill")"
 done
 ```
 
@@ -224,9 +250,15 @@ cursor/
   cli-config.json          # reference cursor-agent config granting full permissions for ~/.cursor/cli-config.json
 
 codex/
+  setup.sh                 # codex installer (copy or --link)
   config.toml              # model, approval, sandbox, and mcp config
   AGENTS.md                # codex instructions plus local skill inventory
   instructions.md          # thin pointer back to AGENTS.md
+  hooks.json               # codex lifecycle hooks
+  hooks/
+    expose-worktrees.sh    # surfaces managed codex worktrees as sibling symlinks
+    post-edit-format.sh    # best-effort biome/prettier plus bun lint after edits
+    sound.sh               # non-blocking macos sound helper for hooks
   rules/
     default.rules          # mirrored command allow rules
   skills/
@@ -236,6 +268,8 @@ codex/
     worktree-merge/        # worktree merge and cleanup skill
     code-reviewer/         # manual-use only review skill
     code-simplifier/       # manual-use only simplification skill
+    thermo-nuclear-code-quality-review/
+                            # manual-use strict maintainability review skill
 
 gpu-setup/
   Dockerfile                # runpod pytorch gpu environment
