@@ -151,6 +151,7 @@ table format:
 scans run: 7 (last 15:35, nothing new since 14:50)
 
 - never open a new pr for the same work; push all fixes to the pr branch.
+- you may open a new pr if you find a different, orthogonal or non-follow on issue within the scope of the PR. in that case, indicate it to me below "scans run".
 - never merge the pr. the watcher only fixes, pushes, and replies - i do the final merge. bound by the never-merge rule above (no `gh pr merge`, no auto-merge, no `/merge`).
 - never use `/autofix-pr` or other cloud pr watchers. keep monitoring in-session with `/fork`.
 - stop monitoring once the pr is merged or closed.
