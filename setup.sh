@@ -64,7 +64,7 @@ echo "=================================="
 echo ""
 
 # create target directories
-mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills"
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules"
 
 # --- settings.json ---
 echo "settings.json:"
@@ -224,26 +224,6 @@ else
     for file in "$SRC_DIR/rules/"*; do
         [ -f "$file" ] || continue
         install_file "$file" "$CLAUDE_DIR/rules/$(basename "$file")"
-    done
-fi
-echo ""
-
-# --- skills ---
-echo "skills:"
-if [ "$MODE" = "link" ]; then
-    rm -f "$CLAUDE_DIR/skills" 2>/dev/null || true
-    rmdir "$CLAUDE_DIR/skills" 2>/dev/null || true
-    ln -sfn "$SRC_DIR/skills" "$CLAUDE_DIR/skills"
-    echo "  linked skills/"
-else
-    for skill_dir in "$SRC_DIR/skills/"*/; do
-        [ -d "$skill_dir" ] || continue
-        skill_name="$(basename "$skill_dir")"
-        mkdir -p "$CLAUDE_DIR/skills/$skill_name"
-        for file in "$skill_dir"*; do
-            [ -f "$file" ] || continue
-            install_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
-        done
     done
 fi
 echo ""
