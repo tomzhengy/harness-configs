@@ -54,6 +54,24 @@ backup_file() {
     echo "  backed up $(basename "$path") -> $BACKUP_DIR/"
 }
 
+backup_path_for_link() {
+    local path="$1"
+    [ -e "$path" ] || [ -L "$path" ] || return 0
+
+    if [ -L "$path" ]; then
+        rm -f "$path"
+        return 0
+    fi
+
+    if [ -z "$BACKUP_DIR" ]; then
+        BACKUP_DIR="$CODEX_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
+        mkdir -p "$BACKUP_DIR"
+    fi
+
+    mv "$path" "$BACKUP_DIR/$(basename "$path")"
+    echo "  backed up $(basename "$path") -> $BACKUP_DIR/"
+}
+
 install_file() {
     local src="$1"
     local dest="$2"
@@ -70,15 +88,14 @@ install_file() {
 install_dir_files() {
     local src_dir="$1"
     local dest_dir="$2"
-    mkdir -p "$dest_dir"
     if [ "$MODE" = "link" ]; then
-        rm -f "$dest_dir" 2>/dev/null || true
-        rmdir "$dest_dir" 2>/dev/null || true
+        backup_path_for_link "$dest_dir"
         ln -sfn "$src_dir" "$dest_dir"
         echo "  linked $(basename "$dest_dir")/"
         return 0
     fi
 
+    mkdir -p "$dest_dir"
     for file in "$src_dir"/*; do
         [ -f "$file" ] || continue
         install_file "$file" "$dest_dir/$(basename "$file")"
@@ -92,6 +109,7 @@ install_skills() {
         skill_name="$(basename "$skill_dir")"
         dest="$SKILLS_DIR/$skill_name"
         if [ "$MODE" = "link" ]; then
+            backup_path_for_link "$dest"
             ln -sfn "$skill_dir" "$dest"
             echo "  linked $skill_name"
         else
