@@ -1,0 +1,53 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.codex/hooks/expose-worktrees.sh",
+            "timeout": 30,
+            "statusMessage": "Exposing Codex worktrees"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.codex/hooks/sound.sh Ping",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.codex/hooks/post-edit-format.sh",
+            "timeout": 120,
+            "statusMessage": "Formatting edited files"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.codex/hooks/sound.sh Glass",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
