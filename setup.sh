@@ -64,7 +64,7 @@ echo "=================================="
 echo ""
 
 # create target directories
-mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules"
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills" "$CLAUDE_DIR/scripts"
 
 # --- settings.json ---
 echo "settings.json:"
@@ -226,6 +226,34 @@ else
         install_file "$file" "$CLAUDE_DIR/rules/$(basename "$file")"
     done
 fi
+echo ""
+
+# --- scripts ---
+echo "scripts:"
+for file in "$SRC_DIR/scripts/"*; do
+    [ -f "$file" ] || continue
+    install_file "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
+    chmod +x "$CLAUDE_DIR/scripts/$(basename "$file")"
+done
+echo ""
+
+# --- skills ---
+echo "skills:"
+for skill_dir in "$SRC_DIR/skills/"*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name="$(basename "$skill_dir")"
+    if [ "$MODE" = "link" ]; then
+        rm -rf "$CLAUDE_DIR/skills/$skill_name"
+        ln -sfn "${skill_dir%/}" "$CLAUDE_DIR/skills/$skill_name"
+        echo "  linked skills/$skill_name"
+    else
+        mkdir -p "$CLAUDE_DIR/skills/$skill_name"
+        for file in "$skill_dir"*; do
+            [ -f "$file" ] || continue
+            install_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
+        done
+    fi
+done
 echo ""
 
 # --- summary ---
