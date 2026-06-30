@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Turn on away mode (default 8 hours, or the whole number of hours given as an argument):
 
-!`~/.claude/scripts/away-mode.sh enable "$1"`
+!`~/.claude/scripts/away-mode.sh enable "$0"`
 
 The line above is the control script's actual output and is the source of truth: if it
 printed an error (for example a non-integer hours value), away mode is NOT on.

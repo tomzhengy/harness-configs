@@ -64,7 +64,7 @@ echo "=================================="
 echo ""
 
 # create target directories
-mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules"
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills" "$CLAUDE_DIR/scripts"
 
 # --- settings.json ---
 echo "settings.json:"
@@ -224,6 +224,46 @@ else
     for file in "$SRC_DIR/rules/"*; do
         [ -f "$file" ] || continue
         install_file "$file" "$CLAUDE_DIR/rules/$(basename "$file")"
+    done
+fi
+echo ""
+
+# --- scripts ---
+echo "scripts:"
+if [ "$MODE" = "link" ]; then
+    for file in "$SRC_DIR/scripts/"*; do
+        [ -f "$file" ] || continue
+        ln -sf "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
+        echo "  linked scripts/$(basename "$file")"
+    done
+else
+    for file in "$SRC_DIR/scripts/"*; do
+        [ -f "$file" ] || continue
+        install_file "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
+        chmod +x "$CLAUDE_DIR/scripts/$(basename "$file")"
+    done
+fi
+echo ""
+
+# --- skills ---
+echo "skills:"
+if [ "$MODE" = "link" ]; then
+    for skill_dir in "$SRC_DIR/skills/"*/; do
+        [ -d "$skill_dir" ] || continue
+        skill_name="$(basename "$skill_dir")"
+        rm -rf "$CLAUDE_DIR/skills/$skill_name" 2>/dev/null || true
+        ln -sfn "${skill_dir%/}" "$CLAUDE_DIR/skills/$skill_name"
+        echo "  linked skills/$skill_name"
+    done
+else
+    for skill_dir in "$SRC_DIR/skills/"*/; do
+        [ -d "$skill_dir" ] || continue
+        skill_name="$(basename "$skill_dir")"
+        mkdir -p "$CLAUDE_DIR/skills/$skill_name"
+        for file in "$skill_dir"*; do
+            [ -f "$file" ] || continue
+            install_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
+        done
     done
 fi
 echo ""
