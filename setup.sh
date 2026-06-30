@@ -239,6 +239,8 @@ if [ "$MODE" = "link" ]; then
 else
     for file in "$SRC_DIR/scripts/"*; do
         [ -f "$file" ] || continue
+        # back up an existing user script before cp -f overwrites it (mirrors the skill/config backup)
+        backup_file "$CLAUDE_DIR/scripts/$(basename "$file")"
         install_file "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
         chmod +x "$CLAUDE_DIR/scripts/$(basename "$file")"
     done
@@ -274,7 +276,12 @@ else
         # back up an existing skill before overwriting its files, mirroring link mode.
         # copy mode used to clobber a user's own away/back/call-user skill (or a locally
         # edited prior install) with no backup, unlike the config files and the link branch.
-        if [ -d "$target_skill" ] && [ -n "$(ls -A "$target_skill" 2>/dev/null)" ]; then
+        if [ -L "$target_skill" ]; then
+            # a symlink (e.g. from a prior --link install) would make -d follow it and the
+            # copy loop write through to the external target, clobbering it with no restorable
+            # backup. drop the link so we install a fresh local dir instead.
+            rm -f "$target_skill"
+        elif [ -d "$target_skill" ] && [ -n "$(ls -A "$target_skill" 2>/dev/null)" ]; then
             if [ -z "$BACKUP_DIR" ]; then
                 BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
                 mkdir -p "$BACKUP_DIR"

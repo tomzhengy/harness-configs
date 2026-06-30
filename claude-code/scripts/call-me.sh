@@ -24,8 +24,14 @@ UNTIL="$(cat "$STATE" 2>/dev/null)"
 case "$UNTIL" in
   ''|*[!0-9]*) rm -f "$STATE"; echo "Away state invalid — no call placed."; exit 0 ;;
 esac
-if [ "$(date +%s)" -ge "$UNTIL" ]; then
-  rm -f "$STATE"; echo "Away window expired — no call placed."; exit 0
+# fail closed: dial only when UNTIL is a valid integer strictly in the future. an all-digit
+# value above bash's intmax range (e.g. 10^36) passes the case glob above, but then makes -gt
+# error with "integer expression expected" and return nonzero; negating the test routes that to
+# the skip path instead of crashing through to the dial. so out-of-range / corrupted epochs
+# skip the call instead of ringing.
+NOW="$(date +%s)"
+if ! [ "$UNTIL" -gt "$NOW" ] 2>/dev/null; then
+  rm -f "$STATE"; echo "Away window expired or invalid — no call placed."; exit 0
 fi
 
 # xml-escape the spoken message via sed so it cannot break the TwiML or inject verbs such as

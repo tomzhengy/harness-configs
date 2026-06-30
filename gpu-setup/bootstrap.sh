@@ -132,9 +132,9 @@ mkdir -p "$CLAUDE_DIR"
 
 CONF_BASE="$CONFIG_DIR/claude-code"
 
-# symlink directories. skills + scripts carry the /call-user, /away and /back alert system,
-# so the GPU bootstrap install path must wire them in too (setup.sh already does).
-for dir in agents commands rules skills scripts; do
+# symlink whole directories. scripts carries the /call-user dial script, so the GPU bootstrap
+# install path must wire it in too (setup.sh already does).
+for dir in agents commands rules scripts; do
     target="$CONF_BASE/$dir"
     [ -d "$target" ] || continue
     link="$CLAUDE_DIR/$dir"
@@ -145,6 +145,28 @@ for dir in agents commands rules skills scripts; do
     ln -sfn "$target" "$link"
     echo "  $link -> $target"
 done
+
+# skills: link each skill individually into ~/.claude/skills so a preexisting personal skills
+# dir (and the user's own skills in it) survives, instead of replacing the whole parent dir.
+# mirrors setup.sh, which installs skills individually rather than symlinking the parent.
+if [ -d "$CONF_BASE/skills" ]; then
+    # drop a whole-dir symlink left by an older bootstrap so we populate a real dir, not the repo
+    if [ -L "$CLAUDE_DIR/skills" ]; then
+        rm -f "$CLAUDE_DIR/skills"
+    fi
+    mkdir -p "$CLAUDE_DIR/skills"
+    for skill_dir in "$CONF_BASE/skills/"*/; do
+        [ -d "$skill_dir" ] || continue
+        skill_name="$(basename "$skill_dir")"
+        link="$CLAUDE_DIR/skills/$skill_name"
+        if [ -e "$link" ] && [ ! -L "$link" ]; then
+            echo "warning: $link exists and is not a symlink, backing up"
+            mv "$link" "${link}.bak"
+        fi
+        ln -sfn "${skill_dir%/}" "$link"
+        echo "  $link -> ${skill_dir%/}"
+    done
+fi
 
 # the alert scripts must be executable (call-user runs ~/.claude/scripts/call-me.sh);
 # they are committed 100755, but enforce it so a clobbered mode bit doesn't break the call
