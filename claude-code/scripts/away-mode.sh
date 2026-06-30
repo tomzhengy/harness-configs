@@ -25,8 +25,19 @@ case "$1" in
       echo "error: could not compute expiry time. away mode NOT enabled." >&2
       exit 1
     fi
-    # write atomically so a reader never sees a half-written file
-    tmp="$(mktemp "${STATE}.XXXXXX")" && printf '%s\n' "$UNTIL" > "$tmp" && mv -f "$tmp" "$STATE"
+    # write atomically so a reader never sees a half-written file. fail closed: if mktemp, the
+    # write, or the rename fails (missing/unwritable ~/.claude, full disk), report it and exit
+    # nonzero. the old && chain fell through to "Away mode ON" on a failed write, so /away
+    # claimed the window was armed while no state file existed and later calls were suppressed.
+    if ! tmp="$(mktemp "${STATE}.XXXXXX" 2>/dev/null)"; then
+      echo "error: could not create state file in $HOME/.claude. away mode NOT enabled." >&2
+      exit 1
+    fi
+    if ! printf '%s\n' "$UNTIL" > "$tmp" 2>/dev/null || ! mv -f "$tmp" "$STATE" 2>/dev/null; then
+      rm -f "$tmp" 2>/dev/null || true
+      echo "error: could not write away state. away mode NOT enabled." >&2
+      exit 1
+    fi
     echo "Away mode ON for $HOURS hours."
     ;;
   disable)

@@ -16,22 +16,23 @@ if [ ! -f "$STATE" ]; then
   echo "Not away — no call placed."; exit 0
 fi
 
-# gate 2: state must be a valid future timestamp. fail closed: empty / non-numeric / expired
-# all skip the call and clean up. the old script fell through to dialing on a bad value.
+# gate 2: state must be a single, all-digit future epoch. fail closed: empty / non-numeric /
+# multiline / expired all skip the call and clean up. grep -Eq matched line-by-line, so a
+# file like "0\nx" slipped through (first line numeric), then crashed the -ge compare into
+# the dial path. the case glob rejects any non-digit char, the newline included.
 UNTIL="$(cat "$STATE" 2>/dev/null)"
-if ! printf '%s' "$UNTIL" | grep -Eq '^[0-9]+$'; then
-  rm -f "$STATE"; echo "Away state invalid — no call placed."; exit 0
-fi
+case "$UNTIL" in
+  ''|*[!0-9]*) rm -f "$STATE"; echo "Away state invalid — no call placed."; exit 0 ;;
+esac
 if [ "$(date +%s)" -ge "$UNTIL" ]; then
   rm -f "$STATE"; echo "Away window expired — no call placed."; exit 0
 fi
 
-# xml-escape the spoken message so it cannot break the TwiML or inject verbs such as
-# </Say><Dial>...; order matters, escape & first
-ESC="$MSG"
-ESC="${ESC//&/&amp;}"
-ESC="${ESC//</&lt;}"
-ESC="${ESC//>/&gt;}"
+# xml-escape the spoken message via sed so it cannot break the TwiML or inject verbs such as
+# </Say><Dial>...; order matters, escape & first. use sed, not bash ${//}: with
+# patsub_replacement (bash 5.2+) an unescaped & in a ${var//</&lt;} replacement expands to
+# the matched char, turning < into <lt; instead of &lt;. in sed, \& is a literal ampersand.
+ESC="$(printf '%s' "$MSG" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')"
 
 # keep the long-lived auth token and the phone numbers off the process argv (they would
 # otherwise be visible via ps); pass them to curl through a config read from stdin (-K -).

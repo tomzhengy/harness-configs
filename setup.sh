@@ -251,8 +251,19 @@ if [ "$MODE" = "link" ]; then
     for skill_dir in "$SRC_DIR/skills/"*/; do
         [ -d "$skill_dir" ] || continue
         skill_name="$(basename "$skill_dir")"
-        rm -rf "$CLAUDE_DIR/skills/$skill_name" 2>/dev/null || true
-        ln -sfn "${skill_dir%/}" "$CLAUDE_DIR/skills/$skill_name"
+        target="$CLAUDE_DIR/skills/$skill_name"
+        if [ -L "$target" ]; then
+            rm -f "$target"            # existing symlink: safe to replace
+        elif [ -e "$target" ]; then
+            # real file/dir with possible user edits: back it up, never silently rm -rf it
+            if [ -z "$BACKUP_DIR" ]; then
+                BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
+                mkdir -p "$BACKUP_DIR"
+            fi
+            mv "$target" "$BACKUP_DIR/$skill_name"
+            echo "  backed up skills/$skill_name -> $BACKUP_DIR/"
+        fi
+        ln -sfn "${skill_dir%/}" "$target"
         echo "  linked skills/$skill_name"
     done
 else
