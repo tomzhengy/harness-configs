@@ -6,7 +6,8 @@
 #
 # usage: call-me.sh "spoken message"   # rings only if away mode is active and unexpired
 #
-# requires env vars: TWILIO_SID, TWILIO_TOKEN, TWILIO_NUMBER, MY_PHONE
+# needs TWILIO_SID, TWILIO_TOKEN, TWILIO_NUMBER, MY_PHONE — supplied either as inherited env
+# vars or via a private ~/.claude/.env file that this script sources only when about to dial.
 
 STATE="$HOME/.claude/away_until"
 MSG="${1:-Claude Code needs your attention.}"
@@ -33,6 +34,10 @@ NOW="$(date +%s)"
 if ! [ "$UNTIL" -gt "$NOW" ] 2>/dev/null; then
   rm -f "$STATE"; echo "Away window expired or invalid — no call placed."; exit 0
 fi
+
+# load twilio credentials now that we are actually going to dial. a private ~/.claude/.env keeps
+# the token out of the shell environment of every other command; falls back to inherited env vars.
+[ -f "$HOME/.claude/.env" ] && . "$HOME/.claude/.env"
 
 # xml-escape the spoken message via sed so it cannot break the TwiML or inject verbs such as
 # </Say><Dial>...; order matters, escape & first. use sed, not bash ${//}: with
