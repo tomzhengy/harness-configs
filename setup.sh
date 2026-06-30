@@ -63,16 +63,8 @@ echo "harness-configs setup ($MODE mode)"
 echo "=================================="
 echo ""
 
-# create target directories. drop a pre-existing symlink at the skills/scripts parents first:
-# an older whole-directory bootstrap or dotfiles link can point these into this repo, and a plain
-# mkdir -p would follow the link and leave it in place. the per-item loops below would then resolve
-# through the parent to $SRC_DIR and back up / relink the repo's own source files onto themselves
-# (a self-referential symlink in --link, or a cp same-file abort under set -e in copy mode).
-mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules"
-for d in skills scripts; do
-    [ -L "$CLAUDE_DIR/$d" ] && rm -f "$CLAUDE_DIR/$d"
-    mkdir -p "$CLAUDE_DIR/$d"
-done
+# create target directories
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills" "$CLAUDE_DIR/scripts"
 
 # --- settings.json ---
 echo "settings.json:"
@@ -238,93 +230,30 @@ echo ""
 
 # --- scripts ---
 echo "scripts:"
-if [ "$MODE" = "link" ]; then
-    for file in "$SRC_DIR/scripts/"*; do
-        [ -f "$file" ] || continue
-        target_script="$CLAUDE_DIR/scripts/$(basename "$file")"
-        # mirror the skill link branch: an existing symlink is safe to replace, but a real
-        # file with local edits must be backed up, never silently deleted by ln -sf.
-        if [ -L "$target_script" ]; then
-            rm -f "$target_script"
-        elif [ -e "$target_script" ]; then
-            if [ -z "$BACKUP_DIR" ]; then
-                BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
-                mkdir -p "$BACKUP_DIR"
-            fi
-            mv "$target_script" "$BACKUP_DIR/$(basename "$file")"
-            echo "  backed up scripts/$(basename "$file") -> $BACKUP_DIR/"
-        fi
-        ln -sf "$file" "$target_script"
-        echo "  linked scripts/$(basename "$file")"
-    done
-else
-    for file in "$SRC_DIR/scripts/"*; do
-        [ -f "$file" ] || continue
-        target_script="$CLAUDE_DIR/scripts/$(basename "$file")"
-        # a symlink target (e.g. from a prior --link install) makes cp -f either abort as
-        # "same file" (link points back here) or write through to an external script with no
-        # backup. drop the link so cp installs a fresh local copy, mirroring the skill block.
-        if [ -L "$target_script" ]; then
-            rm -f "$target_script"
-        else
-            # back up an existing real user script before cp -f overwrites it (mirrors skill/config backup)
-            backup_file "$target_script"
-        fi
-        install_file "$file" "$target_script"
-        chmod +x "$target_script"
-    done
-fi
+for file in "$SRC_DIR/scripts/"*; do
+    [ -f "$file" ] || continue
+    install_file "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
+    chmod +x "$CLAUDE_DIR/scripts/$(basename "$file")"
+done
 echo ""
 
 # --- skills ---
 echo "skills:"
-if [ "$MODE" = "link" ]; then
-    for skill_dir in "$SRC_DIR/skills/"*/; do
-        [ -d "$skill_dir" ] || continue
-        skill_name="$(basename "$skill_dir")"
-        target="$CLAUDE_DIR/skills/$skill_name"
-        if [ -L "$target" ]; then
-            rm -f "$target"            # existing symlink: safe to replace
-        elif [ -e "$target" ]; then
-            # real file/dir with possible user edits: back it up, never silently rm -rf it
-            if [ -z "$BACKUP_DIR" ]; then
-                BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
-                mkdir -p "$BACKUP_DIR"
-            fi
-            mv "$target" "$BACKUP_DIR/$skill_name"
-            echo "  backed up skills/$skill_name -> $BACKUP_DIR/"
-        fi
-        ln -sfn "${skill_dir%/}" "$target"
+for skill_dir in "$SRC_DIR/skills/"*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name="$(basename "$skill_dir")"
+    if [ "$MODE" = "link" ]; then
+        rm -rf "$CLAUDE_DIR/skills/$skill_name"
+        ln -sfn "${skill_dir%/}" "$CLAUDE_DIR/skills/$skill_name"
         echo "  linked skills/$skill_name"
-    done
-else
-    for skill_dir in "$SRC_DIR/skills/"*/; do
-        [ -d "$skill_dir" ] || continue
-        skill_name="$(basename "$skill_dir")"
-        target_skill="$CLAUDE_DIR/skills/$skill_name"
-        # back up an existing skill before overwriting its files, mirroring link mode.
-        # copy mode used to clobber a user's own away/back/call-user skill (or a locally
-        # edited prior install) with no backup, unlike the config files and the link branch.
-        if [ -L "$target_skill" ]; then
-            # a symlink (e.g. from a prior --link install) would make -d follow it and the
-            # copy loop write through to the external target, clobbering it with no restorable
-            # backup. drop the link so we install a fresh local dir instead.
-            rm -f "$target_skill"
-        elif [ -d "$target_skill" ] && [ -n "$(ls -A "$target_skill" 2>/dev/null)" ]; then
-            if [ -z "$BACKUP_DIR" ]; then
-                BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
-                mkdir -p "$BACKUP_DIR"
-            fi
-            cp -R "$target_skill" "$BACKUP_DIR/$skill_name"
-            echo "  backed up skills/$skill_name -> $BACKUP_DIR/"
-        fi
-        mkdir -p "$target_skill"
+    else
+        mkdir -p "$CLAUDE_DIR/skills/$skill_name"
         for file in "$skill_dir"*; do
             [ -f "$file" ] || continue
-            install_file "$file" "$target_skill/$(basename "$file")"
+            install_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
         done
-    done
-fi
+    fi
+done
 echo ""
 
 # --- summary ---

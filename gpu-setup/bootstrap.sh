@@ -132,11 +132,9 @@ mkdir -p "$CLAUDE_DIR"
 
 CONF_BASE="$CONFIG_DIR/claude-code"
 
-# symlink whole directories. scripts and skills are installed per-file below so a user's own
-# scripts/skills dir survives, instead of replacing the whole parent with a repo-only dir.
+# symlink directories
 for dir in agents commands rules; do
     target="$CONF_BASE/$dir"
-    [ -d "$target" ] || continue
     link="$CLAUDE_DIR/$dir"
     if [ -e "$link" ] && [ ! -L "$link" ]; then
         echo "warning: $link exists and is not a symlink, backing up"
@@ -145,56 +143,6 @@ for dir in agents commands rules; do
     ln -sfn "$target" "$link"
     echo "  $link -> $target"
 done
-
-# skills: link each skill individually into ~/.claude/skills so a preexisting personal skills
-# dir (and the user's own skills in it) survives, instead of replacing the whole parent dir.
-# mirrors setup.sh, which installs skills individually rather than symlinking the parent.
-if [ -d "$CONF_BASE/skills" ]; then
-    # drop only a whole-dir symlink left by an older bootstrap (it points at this repo's skills
-    # dir) so we populate a real dir. leave a user's personal/dotfiles-managed skills symlink in
-    # place and merge into it, instead of replacing it with a repo-only dir.
-    if [ -L "$CLAUDE_DIR/skills" ] && [ "$(readlink "$CLAUDE_DIR/skills")" = "$CONF_BASE/skills" ]; then
-        rm -f "$CLAUDE_DIR/skills"
-    fi
-    mkdir -p "$CLAUDE_DIR/skills"
-    for skill_dir in "$CONF_BASE/skills/"*/; do
-        [ -d "$skill_dir" ] || continue
-        skill_name="$(basename "$skill_dir")"
-        link="$CLAUDE_DIR/skills/$skill_name"
-        if [ -e "$link" ] && [ ! -L "$link" ]; then
-            echo "warning: $link exists and is not a symlink, backing up"
-            mv "$link" "${link}.bak"
-        fi
-        ln -sfn "${skill_dir%/}" "$link"
-        echo "  $link -> ${skill_dir%/}"
-    done
-fi
-
-# scripts: link each script individually so a preexisting personal scripts dir (and the user's
-# own scripts) survives, instead of replacing the whole parent dir. mirrors the skills block above.
-if [ -d "$CONF_BASE/scripts" ]; then
-    # drop only a whole-dir symlink left by an older bootstrap that points at this repo's scripts dir
-    if [ -L "$CLAUDE_DIR/scripts" ] && [ "$(readlink "$CLAUDE_DIR/scripts")" = "$CONF_BASE/scripts" ]; then
-        rm -f "$CLAUDE_DIR/scripts"
-    fi
-    mkdir -p "$CLAUDE_DIR/scripts"
-    for file in "$CONF_BASE/scripts/"*; do
-        [ -f "$file" ] || continue
-        link="$CLAUDE_DIR/scripts/$(basename "$file")"
-        if [ -e "$link" ] && [ ! -L "$link" ]; then
-            echo "warning: $link exists and is not a symlink, backing up"
-            mv "$link" "${link}.bak"
-        fi
-        ln -sf "$file" "$link"
-        echo "  $link -> $file"
-    done
-fi
-
-# the alert scripts must be executable (call-user runs ~/.claude/scripts/call-me.sh);
-# they are committed 100755, but enforce it so a clobbered mode bit doesn't break the call
-if [ -d "$CONF_BASE/scripts" ]; then
-    chmod +x "$CONF_BASE/scripts/"*.sh 2>/dev/null || true
-fi
 
 # symlink individual files
 ln -sf "$CONF_BASE/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
