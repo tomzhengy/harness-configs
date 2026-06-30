@@ -1,12 +1,13 @@
 ---
 name: back
 description: Turn off away mode because you are back. Triggered only by you typing /back; Claude never invokes it on its own.
-allowed-tools: Bash(~/.claude/scripts/call-me.sh:*)
+allowed-tools: Bash(~/.claude/scripts/away-mode.sh:*)
 disable-model-invocation: true
 ---
 
 Turn off away mode:
 
-!`~/.claude/scripts/call-me.sh disable`
+!`~/.claude/scripts/away-mode.sh disable`
 
-Away mode is now OFF. Do not place any phone calls until I enable it again with /away.
+The line above is the control script's actual output. Away mode is off once it prints
+"Away mode OFF." Do not place any phone calls until I enable it again with /away.
