@@ -38,6 +38,15 @@ case "$1" in
       echo "error: could not write away state. away mode NOT enabled." >&2
       exit 1
     fi
+    # fail closed if $STATE is not a regular file. if away_until already exists as a directory,
+    # mv -f moves the temp file *inside* it (SOURCE... DIRECTORY form) and exits 0, so /away would
+    # claim "Away mode ON" while call-me.sh's [ -f "$STATE" ] check sees no state and never rings.
+    # mv -T would prevent this but is gnu-only, so verify the result for bsd/macos portability.
+    if [ ! -f "$STATE" ]; then
+      rm -f "$STATE/$(basename "$tmp")" 2>/dev/null || true
+      echo "error: $STATE is not a regular file (is it a directory?). away mode NOT enabled." >&2
+      exit 1
+    fi
     echo "Away mode ON for $HOURS hours."
     ;;
   disable)

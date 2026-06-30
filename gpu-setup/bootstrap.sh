@@ -132,9 +132,9 @@ mkdir -p "$CLAUDE_DIR"
 
 CONF_BASE="$CONFIG_DIR/claude-code"
 
-# symlink whole directories. scripts carries the /call-user dial script, so the GPU bootstrap
-# install path must wire it in too (setup.sh already does).
-for dir in agents commands rules scripts; do
+# symlink whole directories. scripts and skills are installed per-file below so a user's own
+# scripts/skills dir survives, instead of replacing the whole parent with a repo-only dir.
+for dir in agents commands rules; do
     target="$CONF_BASE/$dir"
     [ -d "$target" ] || continue
     link="$CLAUDE_DIR/$dir"
@@ -150,8 +150,10 @@ done
 # dir (and the user's own skills in it) survives, instead of replacing the whole parent dir.
 # mirrors setup.sh, which installs skills individually rather than symlinking the parent.
 if [ -d "$CONF_BASE/skills" ]; then
-    # drop a whole-dir symlink left by an older bootstrap so we populate a real dir, not the repo
-    if [ -L "$CLAUDE_DIR/skills" ]; then
+    # drop only a whole-dir symlink left by an older bootstrap (it points at this repo's skills
+    # dir) so we populate a real dir. leave a user's personal/dotfiles-managed skills symlink in
+    # place and merge into it, instead of replacing it with a repo-only dir.
+    if [ -L "$CLAUDE_DIR/skills" ] && [ "$(readlink "$CLAUDE_DIR/skills")" = "$CONF_BASE/skills" ]; then
         rm -f "$CLAUDE_DIR/skills"
     fi
     mkdir -p "$CLAUDE_DIR/skills"
@@ -165,6 +167,26 @@ if [ -d "$CONF_BASE/skills" ]; then
         fi
         ln -sfn "${skill_dir%/}" "$link"
         echo "  $link -> ${skill_dir%/}"
+    done
+fi
+
+# scripts: link each script individually so a preexisting personal scripts dir (and the user's
+# own scripts) survives, instead of replacing the whole parent dir. mirrors the skills block above.
+if [ -d "$CONF_BASE/scripts" ]; then
+    # drop only a whole-dir symlink left by an older bootstrap that points at this repo's scripts dir
+    if [ -L "$CLAUDE_DIR/scripts" ] && [ "$(readlink "$CLAUDE_DIR/scripts")" = "$CONF_BASE/scripts" ]; then
+        rm -f "$CLAUDE_DIR/scripts"
+    fi
+    mkdir -p "$CLAUDE_DIR/scripts"
+    for file in "$CONF_BASE/scripts/"*; do
+        [ -f "$file" ] || continue
+        link="$CLAUDE_DIR/scripts/$(basename "$file")"
+        if [ -e "$link" ] && [ ! -L "$link" ]; then
+            echo "warning: $link exists and is not a symlink, backing up"
+            mv "$link" "${link}.bak"
+        fi
+        ln -sf "$file" "$link"
+        echo "  $link -> $file"
     done
 fi
 

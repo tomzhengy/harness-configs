@@ -233,16 +233,37 @@ echo "scripts:"
 if [ "$MODE" = "link" ]; then
     for file in "$SRC_DIR/scripts/"*; do
         [ -f "$file" ] || continue
-        ln -sf "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
+        target_script="$CLAUDE_DIR/scripts/$(basename "$file")"
+        # mirror the skill link branch: an existing symlink is safe to replace, but a real
+        # file with local edits must be backed up, never silently deleted by ln -sf.
+        if [ -L "$target_script" ]; then
+            rm -f "$target_script"
+        elif [ -e "$target_script" ]; then
+            if [ -z "$BACKUP_DIR" ]; then
+                BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
+                mkdir -p "$BACKUP_DIR"
+            fi
+            mv "$target_script" "$BACKUP_DIR/$(basename "$file")"
+            echo "  backed up scripts/$(basename "$file") -> $BACKUP_DIR/"
+        fi
+        ln -sf "$file" "$target_script"
         echo "  linked scripts/$(basename "$file")"
     done
 else
     for file in "$SRC_DIR/scripts/"*; do
         [ -f "$file" ] || continue
-        # back up an existing user script before cp -f overwrites it (mirrors the skill/config backup)
-        backup_file "$CLAUDE_DIR/scripts/$(basename "$file")"
-        install_file "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
-        chmod +x "$CLAUDE_DIR/scripts/$(basename "$file")"
+        target_script="$CLAUDE_DIR/scripts/$(basename "$file")"
+        # a symlink target (e.g. from a prior --link install) makes cp -f either abort as
+        # "same file" (link points back here) or write through to an external script with no
+        # backup. drop the link so cp installs a fresh local copy, mirroring the skill block.
+        if [ -L "$target_script" ]; then
+            rm -f "$target_script"
+        else
+            # back up an existing real user script before cp -f overwrites it (mirrors skill/config backup)
+            backup_file "$target_script"
+        fi
+        install_file "$file" "$target_script"
+        chmod +x "$target_script"
     done
 fi
 echo ""
