@@ -132,9 +132,11 @@ mkdir -p "$CLAUDE_DIR"
 
 CONF_BASE="$CONFIG_DIR/claude-code"
 
-# symlink directories
-for dir in agents commands rules; do
+# symlink directories. skills + scripts carry the /call-user, /away and /back alert system,
+# so the GPU bootstrap install path must wire them in too (setup.sh already does).
+for dir in agents commands rules skills scripts; do
     target="$CONF_BASE/$dir"
+    [ -d "$target" ] || continue
     link="$CLAUDE_DIR/$dir"
     if [ -e "$link" ] && [ ! -L "$link" ]; then
         echo "warning: $link exists and is not a symlink, backing up"
@@ -143,6 +145,12 @@ for dir in agents commands rules; do
     ln -sfn "$target" "$link"
     echo "  $link -> $target"
 done
+
+# the alert scripts must be executable (call-user runs ~/.claude/scripts/call-me.sh);
+# they are committed 100755, but enforce it so a clobbered mode bit doesn't break the call
+if [ -d "$CONF_BASE/scripts" ]; then
+    chmod +x "$CONF_BASE/scripts/"*.sh 2>/dev/null || true
+fi
 
 # symlink individual files
 ln -sf "$CONF_BASE/config/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"

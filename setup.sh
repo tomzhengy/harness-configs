@@ -270,10 +270,22 @@ else
     for skill_dir in "$SRC_DIR/skills/"*/; do
         [ -d "$skill_dir" ] || continue
         skill_name="$(basename "$skill_dir")"
-        mkdir -p "$CLAUDE_DIR/skills/$skill_name"
+        target_skill="$CLAUDE_DIR/skills/$skill_name"
+        # back up an existing skill before overwriting its files, mirroring link mode.
+        # copy mode used to clobber a user's own away/back/call-user skill (or a locally
+        # edited prior install) with no backup, unlike the config files and the link branch.
+        if [ -d "$target_skill" ] && [ -n "$(ls -A "$target_skill" 2>/dev/null)" ]; then
+            if [ -z "$BACKUP_DIR" ]; then
+                BACKUP_DIR="$CLAUDE_DIR/backups/harness-$(date +%Y%m%d-%H%M%S)"
+                mkdir -p "$BACKUP_DIR"
+            fi
+            cp -R "$target_skill" "$BACKUP_DIR/$skill_name"
+            echo "  backed up skills/$skill_name -> $BACKUP_DIR/"
+        fi
+        mkdir -p "$target_skill"
         for file in "$skill_dir"*; do
             [ -f "$file" ] || continue
-            install_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
+            install_file "$file" "$target_skill/$(basename "$file")"
         done
     done
 fi

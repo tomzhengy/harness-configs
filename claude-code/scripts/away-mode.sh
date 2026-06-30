@@ -41,7 +41,15 @@ case "$1" in
     echo "Away mode ON for $HOURS hours."
     ;;
   disable)
-    rm -f "$STATE"
+    rm -f "$STATE" 2>/dev/null || true
+    # verify the gate is actually gone. rm -f exits 0 even when it cannot remove the file
+    # (unwritable ~/.claude, wrong ownership, immutable flag), so confirm before reporting OFF.
+    # otherwise /back would claim away mode is off while call-me.sh still sees a future
+    # away_until and keeps ringing the phone.
+    if [ -e "$STATE" ]; then
+      echo "error: could not remove away state ($STATE). away mode is STILL ON." >&2
+      exit 1
+    fi
     echo "Away mode OFF."
     ;;
   *)
