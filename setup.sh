@@ -63,8 +63,16 @@ echo "harness-configs setup ($MODE mode)"
 echo "=================================="
 echo ""
 
-# create target directories
-mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills" "$CLAUDE_DIR/scripts"
+# create target directories. drop a pre-existing symlink at the skills/scripts parents first:
+# an older whole-directory bootstrap or dotfiles link can point these into this repo, and a plain
+# mkdir -p would follow the link and leave it in place. the per-item loops below would then resolve
+# through the parent to $SRC_DIR and back up / relink the repo's own source files onto themselves
+# (a self-referential symlink in --link, or a cp same-file abort under set -e in copy mode).
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules"
+for d in skills scripts; do
+    [ -L "$CLAUDE_DIR/$d" ] && rm -f "$CLAUDE_DIR/$d"
+    mkdir -p "$CLAUDE_DIR/$d"
+done
 
 # --- settings.json ---
 echo "settings.json:"
