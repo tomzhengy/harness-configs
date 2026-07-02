@@ -54,22 +54,6 @@
 - name pull requests like a human would: a plain, descriptive title (e.g. "add search to settings page")
 - never prefix branches or pr titles with `codex/`, `cursor/`, `claude/`, or any other tool/agent name
 - write pr descriptions as a human would, no co-authors, generated-by text, tool attribution, or signatures
-- when you open a pr, you own monitoring it in this session until i merge or close it. one watcher per pr.
-- every 15 minutes, use a Codex thread wakeup or automation if available. each tick should spawn one forked agent or subagent with full context (branch, diff, original intent), let it scan and fix what it finds, and keep the main thread focused on the findings table.
-- the watcher handles merge conflicts, ci failures, and review comments from bugbot, codex, and other reviewers by fixing code, pushing, replying where supported, and resolving threads where supported.
-- keep one tight findings table in chat:
-
-| time  | found             | action                     | status |
-| ----- | ----------------- | -------------------------- | ------ |
-| 14:05 | ci: lint failed   | fixed import order, pushed | green  |
-| 14:50 | codex: naming nit | renamed, replied, resolved | done   |
-
-- after the table, keep a compact counter like `scans run: 7 (last 15:35, nothing new since 14:50)`.
-- never open a new pr for the same work; push all fixes to the pr branch.
-- you may open a new pr if you find a different, orthogonal or non-follow-on issue within the scope of the pr. in that case, note it below `scans run`.
-- never merge the pr. the watcher only fixes, pushes, and replies - i do the final merge.
-- never use `/autofix-pr` or other cloud pr watchers. keep monitoring in-session with `/fork`, subagents, or thread wakeups.
-- stop monitoring once the pr is merged or closed.
 
 ## behavior
 
