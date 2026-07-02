@@ -248,10 +248,15 @@ for skill_dir in "$SRC_DIR/skills/"*/; do
         echo "  linked skills/$skill_name"
     else
         mkdir -p "$CLAUDE_DIR/skills/$skill_name"
-        for file in "$skill_dir"*; do
-            [ -f "$file" ] || continue
-            install_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
-        done
+        # recurse into subdirs so helper scripts (e.g. scripts/) install too, not just top-level files
+        while IFS= read -r file; do
+            rel="${file#"$skill_dir"}"
+            dest="$CLAUDE_DIR/skills/$skill_name/$rel"
+            mkdir -p "$(dirname "$dest")"
+            install_file "$file" "$dest"
+            # preserve the exec bit on vendored helper scripts
+            if [ -x "$file" ]; then chmod +x "$dest"; fi
+        done < <(find "$skill_dir" -type f)
     fi
 done
 echo ""
