@@ -20,9 +20,9 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **broad command rules** - codex `rules/default.rules` mirrors the current claude command-family allowlist rather than the older tighter readme wording
 - **hook parity** - codex `hooks.json` ports worktree exposure, permission/stop sounds, and post-edit format/lint hooks using codex's native hook system
 - **portable mcp startup** - codex mcp config uses `bunx` for github, `uvx` for nia, and documented env forwarding instead of hard-coded local binary paths
-- **skill-based workflow ports** - local skills cover planning, commit messages, worktree merges, code review, and nia research
+- **skill-based workflow ports** - local skills cover planning, commit messages, transcript redaction, worktree merges, code review, and nia research
 - **strict review skill** - codex includes the thermo-nuclear code quality review skill from the claude setup as an explicit/manual skill
-- **explicit native gaps** - codex does not currently replicate claude's custom statusline scripting, transcript scroll keybinding, or claude-only plugin marketplace entries in this repo
+- **explicit native gaps** - codex does not currently replicate claude's custom statusline scripting, transcript scroll keybinding, away/back phone-call commands, babysit's claude-specific loop scheduling, or claude-only plugin marketplace entries in this repo
 
 ## cursor harness features
 
@@ -309,6 +309,7 @@ codex/
   rules/
     default.rules          # mirrored command allow rules
   skills/
+    agent-transcript/       # redact and insert agent transcripts into PRs
     plan/                  # implementation planning skill
     nia-research/          # nia-first external research skill
     commit-message/        # commit title generation skill

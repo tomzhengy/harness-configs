@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Transcript"
+  short_description: "Redact and insert agent transcripts"
+  default_prompt: "Use $agent-transcript to find, redact, preview, and insert a local agent transcript into a PR or issue body."

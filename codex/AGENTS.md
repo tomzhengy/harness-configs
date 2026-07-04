@@ -182,6 +182,7 @@ use these local skills when the task matches them:
 - `plan` - research a codebase and write decision-complete implementation plans before coding
 - `nia-research` - use nia for external repository, documentation, and package research
 - `commit-message` - draft one-line conventional commit messages from the current git state
+- `agent-transcript` - redact, preview, and insert local agent transcripts into GitHub PR or issue bodies
 - `worktree-merge` - merge the current worktree branch into a target branch and remove the worktree safely
 - `code-reviewer` - manual-use only review skill for bugs, risks, regressions, and missing tests
 - `code-simplifier` - manual-use only simplification skill for readability improvements that preserve behavior
