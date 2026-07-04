@@ -207,17 +207,9 @@
     "command": "~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "codex@openai-codex": true,
     "swift-lsp@claude-plugins-official": true
   },
-  "extraKnownMarketplaces": {
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    }
-  },
+  "extraKnownMarketplaces": {},
   "fastMode": true,
   "ultracode": true,
   "theme": "light",
