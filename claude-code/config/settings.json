@@ -208,7 +208,6 @@
   },
   "enabledPlugins": {
     "codex@openai-codex": true,
-    "frontend-design@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
