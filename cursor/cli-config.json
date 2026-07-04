@@ -1,8 +1,12 @@
 {
   "version": 1,
-  "editor": { "vimMode": false },
   "permissions": {
     "allow": ["Shell(*)", "Read(**)", "Write(**)", "WebFetch(*)", "Mcp(*:*)"],
     "deny": []
+  },
+  "notifications": true,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.cursor/statusline.sh"
   }
 }
