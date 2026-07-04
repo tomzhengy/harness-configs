@@ -24,6 +24,16 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **strict review skill** - codex includes the thermo-nuclear code quality review skill from the claude setup as an explicit/manual skill
 - **explicit native gaps** - codex does not currently replicate claude's custom statusline scripting, transcript scroll keybinding, or claude-only plugin marketplace entries in this repo
 
+## cursor harness features
+
+- **rule parity** - `cursor/rules/global.mdc` mirrors the current claude/codex global instructions (bun-first js/ts, assumption surfacing, worktree workflow, commit and pr style) and `cursor/rules/nia.mdc` carries the nia research rules; both install as always-on user rules in `~/.cursor/rules`
+- **hook parity** - `cursor/hooks.json` ports worktree exposure (`sessionStart`), post-edit biome/prettier format plus bun lint (`afterFileEdit`), and the glass done-sound (`stop`) to cursor's native hook system; `~/.cursor/hooks.json` is shared by the ide and the cli
+- **skill cross-discovery** - cursor natively discovers skills from `~/.claude/skills` and the codex skill dirs, so babysit, agent-transcript, call-user, thermo-nuclear-code-quality-review, plan, commit-message, and friends work in cursor without copies; `disable-model-invocation` skills stay slash-invoke only
+- **away-mode commands** - `/away` and `/back` slash commands (`cursor/commands/`) drive the same `~/.claude/scripts/away-mode.sh` control plane and call-user protocol as the claude setup, so the phone-call blocker alerts work from cursor sessions too
+- **custom statusline** - `cursor/statusline.sh` ports the claude statusline (dir, git branch, model, context usage) to the cursor cli statusLine spec, in cool blue to tell cursor sessions apart from claude's warm orange
+- **cli notifications + max permissions** - `cursor/cli-config.json` keeps the full-permission allowlist and adds os notifications plus the statusline wiring
+- **explicit native gaps** - cursor has no permission-prompt hook event (enable the ide's built-in agent notification sound instead), no user-global instructions file for the cli (the rules dir is ide-side; project-level `AGENTS.md` still applies), and babysit's ScheduleWakeup rescheduling is claude-specific (cursor sessions should use the built-in /loop skill for recurring runs)
+
 ## installation
 
 ### quick install (30 seconds)
@@ -80,6 +90,19 @@ set +a
 
 use `claude-code/config/mcp.json` as a reference template and merge those entries into `~/.claude.json` with your API keys. the gpu bootstrap script handles this merge automatically.
 
+### cursor setup
+
+from the `harness-configs` directory, run:
+
+```bash
+./cursor/setup.sh          # copy mode
+./cursor/setup.sh --link   # symlinks for repo authors
+```
+
+the script installs rules, commands, hooks, and the statusline script under `~/.cursor` (override with `CURSOR_HOME`), and merges `cursor/cli-config.json` into `~/.cursor/cli-config.json` with jq. `cli-config.json` is always merged as a real file, never symlinked, because the cursor cli rewrites it at runtime. existing files are backed up before modification. restart cursor afterwards so hooks, rules, and commands reload.
+
+skills are intentionally not duplicated for cursor: it discovers the claude skills in `~/.claude/skills` (installed by the root `setup.sh`) and codex skills natively.
+
 ### cursor mcp servers
 
 use `cursor/mcp.json` as a reference template and merge those entries into `~/.cursor/mcp.json` with your API keys (github + nia, the same two servers as the claude config). cursor does not expand `${VAR}` placeholders, so replace them with real values in the live file:
@@ -93,13 +116,9 @@ restart cursor (or reload mcp servers in settings) after editing.
 
 ### cursor cli permissions
 
-`cursor/cli-config.json` is a reference template that grants the cursor cli (cursor-agent) full permissions: every shell command, read, write, web fetch, and mcp tool is auto-allowed with an empty deny list. copy it to `~/.cursor/cli-config.json` (global config):
+`cursor/cli-config.json` grants the cursor cli (cursor-agent) full permissions: every shell command, read, write, web fetch, and mcp tool is auto-allowed with an empty deny list. it also enables os notifications and points the cli statusline at `~/.cursor/statusline.sh`. `cursor/setup.sh` merges it into `~/.cursor/cli-config.json` for you.
 
-```bash
-cp cursor/cli-config.json ~/.cursor/cli-config.json
-```
-
-note: this is the persistent equivalent of running with `--force` / `--yolo`. only the cursor cli reads `cli-config.json`; the cursor ide app has its own auto-run setting in the app settings ui.
+note: the permission grant is the persistent equivalent of running with `--force` / `--yolo`. only the cursor cli reads `cli-config.json`; the cursor ide app has its own auto-run setting in the app settings ui.
 
 ### codex cli setup
 
@@ -241,13 +260,41 @@ claude-code/
     mcp.json                # reference MCP server entries for ~/.claude.json
     CLAUDE.md               # global instructions (style, behavior, principles)
     statusline-command.sh   # custom statusline with git branch, model, context
+    expose-worktrees.sh     # surfaces claude worktrees as sibling symlinks
+    keybindings.json        # transcript scroll keybinding
 
   rules/
     nia.md                  # nia research assistant rules
 
+  scripts/
+    away-mode.sh            # away-mode control plane (enable/disable)
+    call-me.sh              # twilio dial plane, gated by away mode
+
+  skills/
+    away/                   # /away - arm phone-call blocker alerts
+    back/                   # /back - disarm away mode
+    call-user/              # place a call on blockers while away
+    babysit/                # recurring open-PR maintenance loop
+    agent-transcript/       # redact and insert agent transcripts into PRs
+    thermo-nuclear-code-quality-review/
+                            # manual-use strict maintainability review skill
+
 cursor/
+  setup.sh                 # cursor installer (copy or --link)
   mcp.json                 # reference MCP server entries (github, nia) for ~/.cursor/mcp.json
-  cli-config.json          # reference cursor-agent config granting full permissions for ~/.cursor/cli-config.json
+  cli-config.json          # cursor-agent config: full permissions, notifications, statusline
+  statusline.sh            # custom cli statusline with git branch, model, context
+  hooks.json               # cursor lifecycle hooks (ide + cli)
+  hooks/
+    expose-worktrees.sh    # surfaces cursor-managed worktrees as sibling symlinks
+    post-edit-format.sh    # best-effort biome/prettier plus bun lint after edits
+    sound.sh               # non-blocking macos sound helper for hooks
+  rules/
+    global.mdc             # global instructions ported from CLAUDE.md/AGENTS.md
+    nia.mdc                # nia research assistant rules
+  commands/
+    away.md                # /away - arm the phone-call blocker alerts
+    back.md                # /back - disarm away mode
 
 codex/
   setup.sh                 # codex installer (copy or --link)
