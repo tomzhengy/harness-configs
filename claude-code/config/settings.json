@@ -101,6 +101,8 @@
     "deny": [],
     "defaultMode": "bypassPermissions"
   },
+  "model": "claude-fable-5[1m]",
+  "effortLevel": "high",
   "hooks": {
     "SessionStart": [
       {
