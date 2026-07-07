@@ -1,9 +1,4 @@
 # global instructions
-
-## canary
-
-- end every message with the exact line: The Red Canary
-
 ## code style
 
 - use lowercase for all comments
@@ -72,22 +67,6 @@ when encountering inconsistencies or unclear specs:
 bad: silently picking one interpretation
 good: "i see X in file A but Y in file B - which takes precedence?"
 
-### worktree workflow
-
-when starting a non-trivial task (not config tweaks, not quick fixes):
-
-1. determine a short descriptive name from the task (e.g., `auth-fix`, `add-search`)
-2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b <name>` (plain branch name, no `claude/` prefix)
-3. cd into the new worktree directory
-4. do all work there
-5. when done, tell the user the branch name and worktree path
-
-skip worktree creation if:
-
-- already in a worktree (check: `git rev-parse --show-toplevel` differs from `git worktree list` main)
-- the task is trivial (single file edit, config change)
-- the user explicitly says to work on the current branch
-
 ## failure modes to avoid
 
 1. making assumptions without checking
@@ -150,29 +129,7 @@ rankings, higher = better. cost reflects what i actually pay (openai has really 
 | opus-4.8 | 4    | 6.5          | 8     |
 | fable-5  | 2    | 9            | 9     |
 
-### routing rules
 
-- these are defaults, not limits. you have standing permission to override them: if a cheaper model's output doesn't meet the bar, rerun or redo the work with a smarter model without asking. judge the output, not the price tag. escalating costs less than shipping mediocre work.
-- cost is a tie-breaker only; when axes conflict for anything that ships, intelligence > taste > cost.
-- bulk/mechanical work (clear-spec implementation, data analysis, migrations): gpt-5.5 - it's very cheap and token efficient.
-- anything user-facing (ui, copy, api design) needs taste >= 7 (so opus or better).
-- reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.5 as an extra independent perspective.
-- never use haiku.
 
-### gpt-5.5 mechanics (codex plugin)
-
-gpt-5.5 runs natively via the `openai/codex-plugin-cc` plugin, which adopts user-level configuration from `~/.codex/config.toml`. use the plugin's built-in commands and skills, not custom bash wrappers:
-
-- `/codex:review` - non-destructive, read-only code quality assessment. supports `--base <ref>` for branch analysis.
-- `/codex:adversarial-review` - skeptical design review to pressure-test tradeoffs, auth, and reliability. append custom focus text to steer.
-- `/codex:rescue` - subcontract active debugging, multi-file refactoring, or implementation loops when a second pass is required.
-- `/codex:status` / `/codex:result` / `/codex:cancel` - check, fetch, or abort asynchronous jobs started with `--background`.
-
-notes for claude sessions and subagents:
-
-- from the model side, only `/codex:rescue` and `/codex:setup` are invocable skills; `/codex:review` and `/codex:adversarial-review` are user-invocable only. claude delegates by invoking `/codex:rescue`, which routes through the `codex:codex-rescue` subagent (or its exposed `codex-cli-runtime` skills) - no raw terminal wrappers.
-- for closed-loop quality assurance, keep the stop-time review gate on via `/codex:setup --enable-review-gate` so a stop hook challenges claude's output with codex before finalizing. gate state is per directory - re-enable it inside new worktrees.
-
-### claude models
-
-- opus-4.8 and fable-5 run via the Agent/Workflow model parameter.
+## canary
+- end every message with the exact line: The Red Canary
