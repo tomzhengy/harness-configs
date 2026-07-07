@@ -24,3 +24,6 @@ fast_mode = true
 # preempt the full access warning prompt since we always run with full access
 [notice]
 hide_full_access_warning = true
+
+[projects."/Users/minitom/workspaces/harness-configs"]
+trust_level = "trusted"

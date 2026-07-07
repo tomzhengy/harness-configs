@@ -163,7 +163,7 @@ Rankings, higher = better. Cost reflects what I actually pay (OpenAI has really 
 | model    | cost | intelligence | taste |
 | -------- | ---- | ------------ | ----- |
 | gpt-5.5  | 9    | 8            | 5     |
-| opus-4.8 | 4    | 8            | 8     |
+| opus-4.8 | 4    | 6.5            | 8     |
 | fable-5  | 2    | 9            | 9     |
 
 How to apply:
