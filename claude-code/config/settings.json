@@ -212,8 +212,8 @@
     "swift-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {},
-  "fastMode": true,
-  "ultracode": true,
+  "fastMode": false,
+  "ultracode": false,
   "theme": "light",
   "verbose": true,
   "agentPushNotifEnabled": false,
