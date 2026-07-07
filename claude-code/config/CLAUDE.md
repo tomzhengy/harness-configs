@@ -126,8 +126,7 @@ Rankings, higher = better. Cost reflects what I actually pay (OpenAI has really 
 | model    | cost | intelligence | taste |
 |----------|------|--------------|-------|
 | gpt-5.5  | 9    | 8            | 5     |
-| sonnet-5 | 5    | 5            | 7     |
-| opus-4.8 | 4    | 7            | 8     |
+| opus-4.8 | 4    | 8            | 8     |
 | fable-5  | 2    | 9            | 9     |
 
 How to apply:
@@ -138,7 +137,7 @@ How to apply:
 - Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.5 as an extra independent perspective.
 - Never use Haiku.
 - Mechanics: gpt-5.5 is only reachable through the Codex CLI - `codex exec` / `codex review` (my ~/.codex/config.toml defaults to gpt-5.5). Use the codex-implementation, codex-review, and codex-computer-use skills; for work they don't cover (investigation, data analysis), run `codex exec -s read-only` directly with a self-contained prompt.
-- Claude models (sonnet-5, opus-4.8, fable-5) run via the Agent/Workflow model parameter.
+- Claude models (opus-4.8, fable-5) run via the Agent/Workflow model parameter.
 
 Using gpt-5.5 inside workflows and subagents (the model parameter only takes Claude models, so use a wrapper):
 - Spawn a thin Claude wrapper agent with `model: 'sonnet', effort: 'low'` whose prompt instructs it to write a self-contained codex prompt, run `codex exec` via Bash, and return the raw codex output verbatim as its final message.
