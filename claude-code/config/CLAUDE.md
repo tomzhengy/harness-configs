@@ -71,6 +71,7 @@ when encountering inconsistencies or unclear specs:
 
 bad: silently picking one interpretation
 good: "i see X in file A but Y in file B - which takes precedence?"
+
 ### worktree workflow
 
 when starting a non-trivial task (not config tweaks, not quick fixes):
@@ -141,30 +142,37 @@ don't fill architectural gaps with generic patterns - go back and forth until th
 
 ## picking the right models for workflows and subagents
 
-Rankings, higher = better. Cost reflects what I actually pay (OpenAI has really generous limits), not list price. Intelligence is how hard a problem you can hand the model unsupervised. Taste covers UI/UX, code quality, API design, and copy.
+rankings, higher = better. cost reflects what i actually pay (openai has really generous limits), not list price. intelligence is how hard a problem you can hand the model unsupervised. taste covers ui/ux, code quality, api design, and copy.
 
 | model    | cost | intelligence | taste |
 | -------- | ---- | ------------ | ----- |
 | gpt-5.5  | 9    | 8            | 5     |
-| opus-4.8 | 4    | 6.5            | 8     |
+| opus-4.8 | 4    | 6.5          | 8     |
 | fable-5  | 2    | 9            | 9     |
 
-How to apply:
+### routing rules
 
-- These are defaults, not limits. You have standing permission to override them: if a cheaper model's output doesn't meet the bar, rerun or redo the work with a smarter model without asking. Judge the output, not the price tag. Escalating costs less than shipping mediocre work.
-- Cost is a tie-breaker only; when axes conflict for anything that ships, intelligence > taste > cost.
-- Bulk/mechanical work (clear-spec implementation, data analysis, migrations): gpt-5.5 - it's very cheap and token efficent.
-- Anything user-facing (UI, copy, API design) needs taste >= 7 (so Opus or better).
-- Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.5 as an extra independent perspective.
-- Never use Haiku.
-- Mechanics: gpt-5.5 is handled natively via the `openai/codex-plugin-cc` plugin inside Claude Code, automatically adopting your user-level configurations from `~/.codex/config.toml`. Avoid writing custom bash scripts; instead, utilize the plugin's built-in tools and skills:
-  - `/codex:review` - Run non-destructive, read-only code quality assessments. Supports `--base <ref>` for branch analysis.
-  - `/codex:adversarial-review` - Perform a skeptical design review to pressure-test tradeoffs, auth, and reliability. Append custom focus text at the end of the command to steer the focus.
-  - `/codex:rescue` - Subcontract active debugging, multi-file refactoring, or implementation loops to Codex when a second pass is required.
-  - `/codex:status` / `/codex:result` / `/codex:cancel` - Use these to check, fetch, or abort asynchronous jobs when using the `--background` flag on heavy tasks.
-- Claude models (opus-4.8, fable-5) run via the Agent/Workflow model parameter.
+- these are defaults, not limits. you have standing permission to override them: if a cheaper model's output doesn't meet the bar, rerun or redo the work with a smarter model without asking. judge the output, not the price tag. escalating costs less than shipping mediocre work.
+- cost is a tie-breaker only; when axes conflict for anything that ships, intelligence > taste > cost.
+- bulk/mechanical work (clear-spec implementation, data analysis, migrations): gpt-5.5 - it's very cheap and token efficient.
+- anything user-facing (ui, copy, api design) needs taste >= 7 (so opus or better).
+- reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.5 as an extra independent perspective.
+- never use haiku.
 
-Using gpt-5.5 inside workflows and subagents:
+### gpt-5.5 mechanics (codex plugin)
 
-- Subagents and automated workflows should call the plugin's native slash commands or its exposed `codex-cli-runtime` skills to delegate tasks directly, omitting the need for raw terminal wrappers.
-- For closed-loop quality assurance, keep the review gate turned on via `/codex:setup --enable-review-gate`. This ensures a stop hook automatically challenges Claude's outputs using Codex before finalizing, preventing broken code or weak design assumptions from reaching the main session unvetted.
+gpt-5.5 runs natively via the `openai/codex-plugin-cc` plugin, which adopts user-level configuration from `~/.codex/config.toml`. use the plugin's built-in commands and skills, not custom bash wrappers:
+
+- `/codex:review` - non-destructive, read-only code quality assessment. supports `--base <ref>` for branch analysis.
+- `/codex:adversarial-review` - skeptical design review to pressure-test tradeoffs, auth, and reliability. append custom focus text to steer.
+- `/codex:rescue` - subcontract active debugging, multi-file refactoring, or implementation loops when a second pass is required.
+- `/codex:status` / `/codex:result` / `/codex:cancel` - check, fetch, or abort asynchronous jobs started with `--background`.
+
+notes for claude sessions and subagents:
+
+- from the model side, only `/codex:rescue` and `/codex:setup` are invocable skills; `/codex:review` and `/codex:adversarial-review` are user-invocable only. claude delegates by invoking `/codex:rescue`, which routes through the `codex:codex-rescue` subagent (or its exposed `codex-cli-runtime` skills) - no raw terminal wrappers.
+- for closed-loop quality assurance, keep the stop-time review gate on via `/codex:setup --enable-review-gate` so a stop hook challenges claude's output with codex before finalizing. gate state is per directory - re-enable it inside new worktrees.
+
+### claude models
+
+- opus-4.8 and fable-5 run via the Agent/Workflow model parameter.
