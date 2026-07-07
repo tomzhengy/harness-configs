@@ -50,13 +50,12 @@
 
 ### assumption surfacing
 
-before implementing anything non-trivial, state assumptions:
+when implementing anything non-trivial, state assumptions at the beginning and at the end. always try to eliminate assumptions via research or testing when possible.
 
 ```
 ASSUMPTIONS:
 1. [assumption]
 2. [assumption]
--> correct me now or i'll proceed with these.
 ```
 
 never silently fill in ambiguous requirements.
@@ -72,22 +71,6 @@ when encountering inconsistencies or unclear specs:
 
 bad: silently picking one interpretation
 good: "i see X in file A but Y in file B - which takes precedence?"
-
-### change summaries
-
-after modifications, summarize:
-
-```
-CHANGES MADE:
-- [file]: [what changed and why]
-
-NOT TOUCHED:
-- [file]: [why left alone]
-
-CONCERNS:
-- [risks or things to verify]
-```
-
 ### worktree workflow
 
 when starting a non-trivial task (not config tweaks, not quick fixes):
