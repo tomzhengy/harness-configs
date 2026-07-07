@@ -2,8 +2,6 @@
 ## code style
 
 - use lowercase for all comments
-- keep code simple, avoid over-engineering, functionally should be the same
-- prefer readability over cleverness
 - no emojis
 - no em dashes
 
@@ -15,12 +13,6 @@
 
 - use uv for everything: uv run, uv pip, uv venv
 - use `hf` cli instead of `huggingface-cli` (deprecated)
-
-## clipboard
-
-- clipaste bridges my local mac clipboard to this host over the ssh tunnel. when i say "look at my clipboard", "check my clipboard", "what did i copy", "paste this", or anything similar, run `clipaste-paste`, take the path it prints, and Read that file (usually an image).
-- if it reports "no image on clipboard", tell me to screenshot or copy an image first. do not guess.
-- never trust a path i paste as plain text via cmd+v (e.g. `/Users/.../.cache/clipaste/shot-*.png`). that is my local mac's path and this host cannot read it. always re-fetch with `clipaste-paste` instead.
 
 ## bash
 
