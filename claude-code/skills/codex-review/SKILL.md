@@ -50,3 +50,11 @@ Do not edit files. If there are no substantive findings, say so and name any res
 Add task-specific context when useful: requirements, risky areas, expected behavior, relevant tests, or files Claude is unsure about.
 
 treat findings as one independent perspective: verify each claim against the code before acting on it, and cross-check anything surprising with a fable-5 or opus-4.8 review.
+
+## Reporting Back
+
+Before relaying a Codex finding, inspect the cited code or diff enough to decide whether the finding is real. In the user-facing response, separate confirmed issues from Codex suggestions you did not verify.
+
+If Codex finds nothing, say that clearly and mention what review target it inspected.
+
+If `codex` is not installed or the command fails, report the error and offer to review the changes directly instead.
