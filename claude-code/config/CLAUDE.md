@@ -13,7 +13,6 @@
 ## python
 
 - use uv for everything: uv run, uv pip, uv venv
-- use `hf` cli instead of `huggingface-cli` (deprecated)
 
 ## bash
 
@@ -70,18 +69,6 @@ good: "i see X in file A but Y in file B - which takes precedence?"
 6. not cleaning up dead code after refactors
 7. modifying code orthogonal to the task
 8. removing things you don't fully understand
-
-## philosophy
-
-the human is monitoring in an IDE - they see everything and will catch mistakes. minimize mistakes they need to catch while maximizing useful work.
-
-you have unlimited stamina, the human does not. loop on hard problems, but don't loop on the wrong problem because you failed to clarify the goal.
-
-## don'ts
-
-- don't add features that weren't requested (but you can suggest them)
-- don't refactor unrelated code
-- don't add documentation unless asked
 - never merge prs for me. this covers `gh pr merge`, the github mcp merge tool, auto-merge, and the `/merge` skill. you can open prs, push commits, and tell me they are ready to merge, but i always do the final merge myself. if you think a merge is needed, ask.
 
 ## principles
