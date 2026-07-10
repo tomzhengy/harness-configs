@@ -1,16 +1,9 @@
 # global instructions
-
-## canary
-
-- end every message with the exact line: The Red Canary
-
 ## code style
 
 - use lowercase for all comments
-- keep code simple, avoid over-engineering, functionally should be the same
-- prefer readability over cleverness
 - no emojis
-- no em dashes - use hyphens or colons instead
+- no em dashes
 
 ## javascript/typescript
 
@@ -20,12 +13,6 @@
 
 - use uv for everything: uv run, uv pip, uv venv
 - use `hf` cli instead of `huggingface-cli` (deprecated)
-
-## clipboard
-
-- clipaste bridges my local mac clipboard to this host over the ssh tunnel. when i say "look at my clipboard", "check my clipboard", "what did i copy", "paste this", or anything similar, run `clipaste-paste`, take the path it prints, and inspect that file with the appropriate file or image tool.
-- if it reports "no image on clipboard", tell me to screenshot or copy an image first. do not guess.
-- never trust a path i paste as plain text via cmd+v (e.g. `/Users/.../.cache/clipaste/shot-*.png`). that is my local mac's path and this host cannot read it. always re-fetch with `clipaste-paste` instead.
 
 ## bash
 
@@ -43,29 +30,19 @@
 - use conventional commit prefixes: feat, fix, docs, refactor, chore, test, style
 - lowercase only (including the prefix)
 - one-liner describing what was implemented
-- no signatures, co-authored-by lines, generated-by lines, or agent attribution
-- never add any co-author or tool signature trailer, including `Co-authored-by: ...`
+- no signatures or co-authored-by lines
 - commit after completing each task
-- commit after each feature
-- commit after each discrete change unit - do not batch unrelated changes into one commit
-
-## pull requests
-
-- name pull requests like a human would: a plain, descriptive title (e.g. "add search to settings page")
-- never prefix branches or pr titles with `codex/`, `cursor/`, `claude/`, or any other tool/agent name
-- write pr descriptions as a human would, no co-authors, generated-by text, tool attribution, or signatures
 
 ## behavior
 
 ### assumption surfacing
 
-before implementing anything non-trivial, state assumptions:
+when implementing anything non-trivial, state assumptions at the beginning and at the end. always try to eliminate assumptions via research or testing when possible.
 
 ```
 ASSUMPTIONS:
 1. [assumption]
 2. [assumption]
--> correct me now or i'll proceed with these.
 ```
 
 never silently fill in ambiguous requirements.
@@ -81,45 +58,6 @@ when encountering inconsistencies or unclear specs:
 
 bad: silently picking one interpretation
 good: "i see X in file A but Y in file B - which takes precedence?"
-
-### change summaries
-
-after modifications, summarize:
-
-```
-CHANGES MADE:
-- [file]: [what changed and why]
-
-NOT TOUCHED:
-- [file]: [why left alone]
-
-CONCERNS:
-- [risks or things to verify]
-```
-
-### post-edit checks
-
-after editing code:
-
-1. run the narrowest formatter, lint, or test command that validates the change
-2. prefer bun-based commands for javascript/typescript projects when available
-3. report when checks were skipped or could not run
-
-### worktree workflow
-
-when starting a non-trivial task (not config tweaks, not quick fixes):
-
-1. determine a short descriptive name from the task (e.g., `auth-fix`, `add-search`)
-2. create a worktree: `git worktree add ../$(basename $PWD)-<name> -b <name>`
-3. cd into the new worktree directory
-4. do all work there
-5. when done, tell the user the branch name and worktree path
-
-skip worktree creation if:
-
-- already in a worktree (check: `git rev-parse --show-toplevel` differs from `git worktree list` main)
-- the task is trivial (single file edit, config change)
-- the user explicitly says to work on the current branch
 
 ## failure modes to avoid
 
@@ -150,7 +88,6 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 ### research
 
 - for all the principles below always use nia to research and index documents when needed
-- check nia sources and saved context first when they are relevant
 - use nia mcp as ground truth source
 
 ### scaling
@@ -163,7 +100,7 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 
 for complex features, iterate on the system design before writing code:
 
-- what are the boundaries? what should each component know not know?
+- what are the boundaries? what should each component know/not know?
 - what are the invariants? what must always be true?
 - how does this decompose? what's the natural structure?
 
@@ -171,24 +108,8 @@ don't fill architectural gaps with generic patterns - go back and forth until th
 
 ### constraint-persistence
 
-- when user defines constraints ("never X", "always Y", "from now on"), immediately persist to the closest `AGENTS.md` for this repo, or to this file if no project-level file exists
+- when user defines constraints ("never X", "always Y", "from now on"), immediately persist to project's local AGENTS.md
 - acknowledge, write, confirm
 
-## skills
-
-use these local skills when the task matches them:
-
-- `claude` - use the local Claude Code CLI for read-only review, challenge, or consult second opinions from inside codex
-- `plan` - research a codebase and write decision-complete implementation plans before coding
-- `nia-research` - use nia for external repository, documentation, and package research
-- `commit-message` - draft one-line conventional commit messages from the current git state
-- `agent-transcript` - redact, preview, and insert local agent transcripts into GitHub PR or issue bodies
-- `worktree-merge` - merge the current worktree branch into a target branch and remove the worktree safely
-- `code-reviewer` - manual-use only review skill for bugs, risks, regressions, and missing tests
-- `code-simplifier` - manual-use only simplification skill for readability improvements that preserve behavior
-- `thermo-nuclear-code-quality-review` - manual-use only strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth
-
-before using a skill:
-
-- read the skill's `SKILL.md`
-- use the manual-use only skills only when the user asks for them or when a targeted follow-up pass is clearly warranted
+## canary
+- end every message with the exact line: The Red Canary
