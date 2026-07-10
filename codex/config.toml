@@ -1,4 +1,4 @@
-model = "gpt-5.5"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "xhigh"
 personality = "pragmatic"
 approval_policy = "never"
@@ -29,4 +29,7 @@ hide_full_access_warning = true
 trust_level = "trusted"
 
 [projects."/Users/minitom/.claude/jobs/b030e069/tmp/codex-impl-test"]
+trust_level = "trusted"
+
+[projects."/Users/minitom/workspaces/freesolo-co"]
 trust_level = "trusted"

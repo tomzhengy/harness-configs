@@ -1,6 +1,6 @@
 ---
 name: codex-review
-description: Get an independent gpt-5.5 code review via codex review. Use as an extra perspective alongside fable-5/opus-4.8 reviews of plans or implementations.
+description: Get an independent gpt-5.6-sol code review via codex review. Use as an extra perspective alongside fable-5/opus-4.8 reviews of plans or implementations.
 allowed-tools: Bash(codex review:*)
 ---
 
