@@ -114,18 +114,18 @@ don't fill architectural gaps with generic patterns - go back and forth until th
 
 ## Picking the right models for workflows and subagents
 
-Rankings, higher = better. Cost reflects what I actually pay (OpenAI has really generous limits), not list price. Intelligence is how hard a problem you can hand the model unsupervised. Taste covers UI/UX, code quality, API design, and copy.
+Rankings, higher = better. Cost reflects what I actually pay (OpenAI is near-free for me due to a deal), not list price. Intelligence is how hard a problem you can hand the model unsupervised. Taste covers UI/UX, code quality, API design, and copy.
 
 | model       | cost | intelligence | taste |
 | ----------- | ---- | ------------ | ----- |
-| gpt-5.6-sol | 9    | 8            | 5     |
-| opus-4.8    | 4    | 8            | 8     |
+| gpt-5.6-sol | 9    | 9            | 5     |
+| opus-4.8    | 4    | 7            | 8     |
 | fable-5     | 2    | 9            | 9     |
 
 How to apply:
 
 - These are defaults, not limits. You have standing permission to override them: if a cheaper model's output doesn't meet the bar, rerun or redo the work with a smarter model without asking. Judge the output, not the price tag. Escalating costs less than shipping mediocre work.
-- Cost is a tie-breaker only; when axes conflict for anything that ships, intelligence > taste > cost.
+- Don't let cost prevent you from using the right model for the job. Instead, take advantage of cheaper options to get more information and try things before moving the work to a more expensive and capable option.
 - Bulk/mechanical work (clear-spec implementation, experimental testing, data analysis, migrations): gpt-5.6-sol - it's effectively free.
 - Anything user-facing (UI, copy, API design) needs taste ≥ 7.
 - Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.6-sol as an extra independent perspective.
