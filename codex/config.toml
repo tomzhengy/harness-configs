@@ -3,6 +3,7 @@ model_reasoning_effort = "xhigh"
 personality = "pragmatic"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
+service_tier = "default"
 
 [mcp_servers.github]
 command = "bunx"
@@ -32,4 +33,16 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/minitom/workspaces/freesolo-co"]
+trust_level = "trusted"
+
+[projects."/Users/minitom/Documents/Codex/2026-07-10/let-s-set-up-a-scheduled"]
+trust_level = "trusted"
+
+[projects."/Users/minitom/Documents/Codex/2026-07-10/hi"]
+trust_level = "trusted"
+
+[projects."/Users/minitom/Documents/Codex/2026-07-10/helpme-create-a-scheduled-task-for"]
+trust_level = "trusted"
+
+[projects."/Users/minitom/.claude/jobs/04ae36e0/tmp/entropy-measure"]
 trust_level = "trusted"
