@@ -14,6 +14,8 @@ Prefer Claude's normal review process for small local checks. Do not delegate re
 
 non-destructive and read-only. write custom review instructions (focus areas, context) to "$PROMPT" before running; the review lands in "$REPORT".
 
+run the whole sequence (mktemp, write "$PROMPT", run codex review, read "$REPORT") inside a sonnet wrapper subagent labeled `gpt-5.6-sol:review-<topic>` - it shows up in the UI as a monitorable agent and doesn't block the main session.
+
 Use one of these command shapes:
 
 ```bash
