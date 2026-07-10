@@ -31,4 +31,22 @@ codex -C "$PWD" review --base main - < "$PROMPT" > "$REPORT"
 codex -C "$PWD" review --commit <sha> - < "$PROMPT" > "$REPORT"
 ```
 
+## Review Prompt
+
+Ask Codex to use a code-review stance:
+
+```text
+Review these changes for bugs, regressions, missing tests, security issues, and requirement mismatches.
+
+Prioritize findings over summary. For each finding include:
+- severity
+- file and line reference
+- concrete failure mode
+- suggested fix direction
+
+Do not edit files. If there are no substantive findings, say so and name any residual test gaps.
+```
+
+Add task-specific context when useful: requirements, risky areas, expected behavior, relevant tests, or files Claude is unsure about.
+
 treat findings as one independent perspective: verify each claim against the code before acting on it, and cross-check anything surprising with a fable-5 or opus-4.8 review.
