@@ -69,6 +69,7 @@ good: "i see X in file A but Y in file B - which takes precedence?"
 6. not cleaning up dead code after refactors
 7. modifying code orthogonal to the task
 8. removing things you don't fully understand
+
 - never merge prs for me. this covers `gh pr merge`, the github mcp merge tool, auto-merge, and the `/merge` skill. you can open prs, push commits, and tell me they are ready to merge, but i always do the final merge myself. if you think a merge is needed, ask.
 
 ## principles
@@ -117,12 +118,12 @@ How to apply:
 - Anything user-facing (UI, copy, API design) needs taste ≥ 7.
 - Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.6-sol as an extra independent perspective.
 - Never use Haiku.
-- Mechanics: gpt-5.6-sol is only reachable through the Codex CLI - `codex exec` / `codex review` (my ~/.codex/config.toml defaults to gpt-5.6-sol at xhigh reasoning effort). Use the codex-implementation, codex-review, and codex-computer-use skills; for work they don't cover (investigation, data analysis), run `codex exec -s read-only "<PROMPT>"` directly with a self-contained prompt.
+- Mechanics: gpt-5.6-sol is only reachable through the Codex CLI - `codex exec` / `codex review` (my ~/.codex/config.toml defaults to gpt-5.6-sol at xhigh reasoning effort). Use the codex-implementation, codex-review, and codex-computer-use skills; for work they don't cover (investigation, data analysis), run `codex exec --skip-git-repo-check -s read-only "<PROMPT>"` directly with a self-contained prompt. Always pass `--skip-git-repo-check` to `codex exec` - without it codex refuses untrusted non-git directories.
 - Claude models (opus-4.8, fable-5) run via the Agent/Workflow model parameter.
 
 Using gpt-5.6-sol inside workflows and subagents (the model parameter only takes Claude models, so use a wrapper):
 
-- Spawn a thin Claude wrapper agent with `model: 'sonnet', effort: 'low'` whose prompt instructs it to write a self-contained codex prompt, run `codex exec` via Bash, and return the report (use `schema` on the wrapper to get structured output back).
+- Spawn a thin Claude wrapper agent with `model: 'sonnet', effort: 'low'` whose prompt instructs it to write a self-contained codex prompt, run `codex exec --skip-git-repo-check` via Bash, and return the report (use `schema` on the wrapper to get structured output back).
 - Always label these agents with a `gpt-5.6-sol:` prefix, e.g. `{label: 'gpt-5.6-sol:review-auth'}` - the workflow UI shows the wrapper's Claude model, so the label is the only indication the real worker is gpt-5.6-sol.
 - Codex runs can exceed Bash's 10-minute timeout: pass an explicit timeout, or run in the background and poll for the report file.
 - Parallel gpt-5.6-sol implementation agents must use `isolation: 'worktree'` so codex edits don't collide in the shared checkout.

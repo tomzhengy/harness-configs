@@ -6,7 +6,7 @@ allowed-tools: Bash(codex exec:*)
 
 codex's `computer_use` and `browser_use` features are stable and enabled (check with `codex features list`).
 
-run: `codex exec --enable computer_use --enable browser_use "<prompt>"`
+run: `codex exec --skip-git-repo-check --enable computer_use --enable browser_use "<prompt>"`
 
 the prompt must be self-contained: the url or app to drive, the exact flow to click through, and what to observe and report back. add `-s workspace-write` only if codex needs to save screenshots or files into the workspace.
 

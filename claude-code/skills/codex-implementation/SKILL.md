@@ -6,8 +6,9 @@ allowed-tools: Bash(codex exec:*)
 
 codex shares no context with this session. write a fully self-contained prompt: goal, exact spec, relevant file paths, constraints, and done criteria.
 
-- implementation (writes files): `codex exec -s workspace-write "<prompt>"`
-- investigation / data analysis (no writes): `codex exec -s read-only "<prompt>"`
+- implementation (writes files): `codex exec --skip-git-repo-check -s workspace-write "<prompt>"`
+- investigation / data analysis (no writes): `codex exec --skip-git-repo-check -s read-only "<prompt>"`
+- always pass `--skip-git-repo-check`: without it codex refuses to run in untrusted non-git directories (e.g. tmp scratch dirs).
 - useful flags: `--cd <dir>` to set the working root, `-o <file>` to capture the final message, `-m <model>` to override the model (config.toml already defaults to gpt-5.6-sol).
 
 after it finishes: read the diff (`git diff`), run the tests, and judge the output. if it misses the bar, redo the work with fable-5 or opus-4.8 instead of re-prompting codex endlessly.
