@@ -46,3 +46,6 @@ trust_level = "trusted"
 
 [projects."/Users/minitom/.claude/jobs/04ae36e0/tmp/entropy-measure"]
 trust_level = "trusted"
+
+[projects."/Users/minitom/workspaces/freesolo-co/flash"]
+trust_level = "trusted"
