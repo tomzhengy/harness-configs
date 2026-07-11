@@ -86,6 +86,7 @@ fi
 
 usage_cache_dir="$HOME/.cache/harness-statusline"
 usage_cache_file="$usage_cache_dir/footer-usage.$PPID.txt"
+model_cache_file="$usage_cache_dir/model-header.$PPID.txt"
 mkdir -p "$usage_cache_dir"
 if [ ! -f "$usage_cache_file" ] || [ "$(<"$usage_cache_file")" != "$usage_plain" ]; then
     umask 077
@@ -94,32 +95,18 @@ if [ ! -f "$usage_cache_file" ] || [ "$(<"$usage_cache_file")" != "$usage_plain"
     mv "$usage_cache_tmp" "$usage_cache_file"
 fi
 
-# build plain text first so right alignment ignores ansi color sequences
-left_plain="$dir_basename"
-left_plain="$left_plain +$lines_added -$lines_removed"
-right_plain="$model_name [$effort_level] $context_pct%"
-
-columns=${COLUMNS:-120}
-available_columns=$((columns - 4))
-if ((available_columns < 1)); then
-    available_columns=$columns
-fi
-gap=$((available_columns - ${#left_plain} - ${#right_plain}))
-if ((gap < 1)); then
-    gap=1
+model_plain="$model_name [$effort_level] $context_pct%"
+if [ ! -f "$model_cache_file" ] || [ "$(<"$model_cache_file")" != "$model_plain" ]; then
+    umask 077
+    model_cache_tmp="$model_cache_file.$$"
+    printf '%s' "$model_plain" > "$model_cache_tmp"
+    mv "$model_cache_tmp" "$model_cache_file"
 fi
 
 reset=$'\033[0m'
 orange=$'\033[1;38;5;208m'
-amber=$'\033[38;5;214m'
-gray=$'\033[38;5;246m'
 green=$'\033[38;5;114m'
 red=$'\033[38;5;203m'
 
 printf '%s%s%s' "$orange" "$dir_basename" "$reset"
 printf ' %s+%s%s %s-%s%s' "$green" "$lines_added" "$reset" "$red" "$lines_removed" "$reset"
-printf '%*s' "$gap" ''
-printf '%s%s %s[%s]%s %s%s%%%s' \
-    "$gray" "$model_name" \
-    "$amber" "$effort_level" "$reset" \
-    "$orange" "$context_pct" "$reset"
