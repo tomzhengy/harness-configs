@@ -111,5 +111,10 @@ don't fill architectural gaps with generic patterns - go back and forth until th
 - when user defines constraints ("never X", "always Y", "from now on"), immediately persist to project's local AGENTS.md
 - acknowledge, write, confirm
 
+### subagent reasoning
+
+- when the parent is running `gpt-5.6-sol` with `ultra` reasoning, use `high` reasoning for implementation subagents that receive sufficient context and only need to execute the implementation
+- do not use `ultra` reasoning for those implementation subagents unless they must independently investigate requirements, make architectural decisions, or the user explicitly requests it
+
 ## canary
 - end every message with the exact line: The Red Canary
