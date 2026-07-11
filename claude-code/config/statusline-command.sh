@@ -17,6 +17,71 @@ IFS=$'\t' read -r model_name current_dir context_pct effort_level lines_added li
 
 dir_basename=$(basename "$current_dir")
 
+make_usage_bar() {
+    local percent="$1" width=10 filled empty bar="" index
+    filled=$(((percent * width + 50) / 100))
+    if ((filled > width)); then filled=$width; fi
+    empty=$((width - filled))
+    for ((index = 0; index < filled; index++)); do bar+="█"; done
+    for ((index = 0; index < empty; index++)); do bar+="░"; done
+    printf '%s' "$bar"
+}
+
+format_reset_duration() {
+    local reset_at="$1" now remaining total_minutes days hours minutes
+    now=$(date +%s)
+    remaining=$((reset_at - now))
+    if ((remaining <= 0)); then
+        printf 'now'
+        return
+    fi
+
+    total_minutes=$(((remaining + 59) / 60))
+    days=$((total_minutes / 1440))
+    hours=$(((total_minutes % 1440) / 60))
+    minutes=$((total_minutes % 60))
+    if ((days > 0)); then
+        printf '%dd %dh' "$days" "$hours"
+    elif ((hours > 0)); then
+        printf '%dh %dm' "$hours" "$minutes"
+    else
+        printf '%dm' "$minutes"
+    fi
+}
+
+usage_plain=""
+usage_helper="$HOME/.claude/scripts/provider-usage.js"
+if [ -x "$usage_helper" ]; then
+    usage_json=$("$usage_helper" <<< "$input" 2>/dev/null || true)
+    if [ -n "$usage_json" ]; then
+        IFS=$'\034' read -r primary_pct primary_reset secondary_pct secondary_reset < <(
+            jq -r '[
+                ((.primary.usedPercent // "") | tostring),
+                ((.primary.resetsAt // "") | tostring),
+                ((.secondary.usedPercent // "") | tostring),
+                ((.secondary.resetsAt // "") | tostring)
+            ] | join("\u001c")' <<< "$usage_json"
+        )
+
+        if [ -n "$primary_pct" ]; then
+            primary_pct=$(printf '%.0f' "$primary_pct")
+            usage_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
+            if [ -n "$primary_reset" ]; then
+                usage_plain="$usage_plain · Reset: $(format_reset_duration "$primary_reset")"
+            fi
+        fi
+
+        if [ -n "$secondary_pct" ]; then
+            secondary_pct=$(printf '%.0f' "$secondary_pct")
+            weekly_plain="Weekly: [$(make_usage_bar "$secondary_pct")] $secondary_pct%"
+            if [ -n "$secondary_reset" ]; then
+                weekly_plain="$weekly_plain · Weekly reset: $(format_reset_duration "$secondary_reset")"
+            fi
+            usage_plain="${usage_plain:+$usage_plain · }$weekly_plain"
+        fi
+    fi
+fi
+
 # build plain text first so right alignment ignores ansi color sequences
 left_plain="$dir_basename"
 left_plain="$left_plain +$lines_added -$lines_removed"
@@ -46,3 +111,15 @@ printf '%s%s %s[%s]%s %s%s%%%s' \
     "$gray" "$model_name" \
     "$amber" "$effort_level" "$reset" \
     "$orange" "$context_pct" "$reset"
+
+if [ -n "$usage_plain" ]; then
+    if ((${#usage_plain} > available_columns)); then
+        usage_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
+        if [ -n "$primary_reset" ]; then
+            usage_plain="$usage_plain · Reset: $(format_reset_duration "$primary_reset")"
+        fi
+    fi
+    usage_gap=$((available_columns - ${#usage_plain}))
+    if ((usage_gap < 0)); then usage_gap=0; fi
+    printf '\n%*s%s%s%s' "$usage_gap" '' "$gray" "$usage_plain" "$reset"
+fi
