@@ -18,7 +18,7 @@ IFS=$'\t' read -r model_name current_dir context_pct effort_level lines_added li
 dir_basename=$(basename "$current_dir")
 
 make_usage_bar() {
-    local percent="$1" width=10 filled empty bar="" index
+    local percent="$1" width=8 filled empty bar="" index
     filled=$(((percent * width + 50) / 100))
     if ((filled > width)); then filled=$width; fi
     empty=$((width - filled))
@@ -66,7 +66,7 @@ if [ -x "$usage_helper" ]; then
 
         if [ -n "$primary_pct" ]; then
             primary_pct=$(printf '%.0f' "$primary_pct")
-            session_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
+            session_plain="Session: $(make_usage_bar "$primary_pct") $primary_pct%"
             if [ -n "$primary_reset" ]; then
                 session_plain="$session_plain · $(format_reset_duration "$primary_reset")"
             fi
@@ -75,7 +75,7 @@ if [ -x "$usage_helper" ]; then
 
         if [ -n "$secondary_pct" ]; then
             secondary_pct=$(printf '%.0f' "$secondary_pct")
-            weekly_plain="Weekly: [$(make_usage_bar "$secondary_pct")] $secondary_pct%"
+            weekly_plain="Weekly: $(make_usage_bar "$secondary_pct") $secondary_pct%"
             if [ -n "$secondary_reset" ]; then
                 weekly_plain="$weekly_plain · $(format_reset_duration "$secondary_reset")"
             fi
