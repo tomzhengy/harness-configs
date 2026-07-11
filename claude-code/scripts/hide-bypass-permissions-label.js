@@ -158,4 +158,26 @@ if (foregroundAgentPatchCount === 0) {
     );
 }
 
+const idleAgentMarker = 'harness-hide-for-agents';
+const idleAgentPatchCount = js.split(idleAgentMarker).length - 1;
+if (idleAgentPatchCount === 0) {
+    const idleAgentPattern = new RegExp(
+        `(${identifier})=${identifier}\\.jsxs\\(${identifier},\\{dimColor:!0,children:\\[${identifier}," for agents"\\]\\}\\)`,
+        'g'
+    );
+    const idleAgentMatches = [...js.matchAll(idleAgentPattern)];
+    if (idleAgentMatches.length !== 1) {
+        throw new Error(`expected one idle agent hint, found ${idleAgentMatches.length}`);
+    }
+
+    js = js.replace(
+        idleAgentPattern,
+        '$1=null/* harness-hide-for-agents */'
+    );
+} else if (idleAgentPatchCount !== 1) {
+    throw new Error(
+        `expected zero or one idle agent hint patches, found ${idleAgentPatchCount}`
+    );
+}
+
 return js;
