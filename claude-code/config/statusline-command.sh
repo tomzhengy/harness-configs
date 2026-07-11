@@ -49,6 +49,7 @@ format_reset_duration() {
     fi
 }
 
+session_plain=""
 usage_plain=""
 usage_helper="$HOME/.claude/scripts/provider-usage.js"
 if [ -x "$usage_helper" ]; then
@@ -65,10 +66,11 @@ if [ -x "$usage_helper" ]; then
 
         if [ -n "$primary_pct" ]; then
             primary_pct=$(printf '%.0f' "$primary_pct")
-            usage_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
+            session_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
             if [ -n "$primary_reset" ]; then
-                usage_plain="$usage_plain · $(format_reset_duration "$primary_reset")"
+                session_plain="$session_plain · $(format_reset_duration "$primary_reset")"
             fi
+            usage_plain="$session_plain"
         fi
 
         if [ -n "$secondary_pct" ]; then
@@ -85,13 +87,30 @@ fi
 # build plain text first so right alignment ignores ansi color sequences
 left_plain="$dir_basename"
 left_plain="$left_plain +$lines_added -$lines_removed"
-right_plain="$model_name [$effort_level] $context_pct%"
+model_plain="$model_name [$effort_level] $context_pct%"
+right_plain="$model_plain"
 
 columns=${COLUMNS:-120}
 available_columns=$((columns - 4))
 if ((available_columns < 1)); then
     available_columns=$columns
 fi
+
+usage_inline=""
+if [ -n "$usage_plain" ]; then
+    full_right_plain="$usage_plain · $model_plain"
+    if ((${#left_plain} + ${#full_right_plain} + 1 <= available_columns)); then
+        usage_inline="$usage_plain"
+        right_plain="$full_right_plain"
+    elif [ -n "$session_plain" ]; then
+        session_right_plain="$session_plain · $model_plain"
+        if ((${#left_plain} + ${#session_right_plain} + 1 <= available_columns)); then
+            usage_inline="$session_plain"
+            right_plain="$session_right_plain"
+        fi
+    fi
+fi
+
 gap=$((available_columns - ${#left_plain} - ${#right_plain}))
 if ((gap < 1)); then
     gap=1
@@ -107,19 +126,10 @@ red=$'\033[38;5;203m'
 printf '%s%s%s' "$orange" "$dir_basename" "$reset"
 printf ' %s+%s%s %s-%s%s' "$green" "$lines_added" "$reset" "$red" "$lines_removed" "$reset"
 printf '%*s' "$gap" ''
+if [ -n "$usage_inline" ]; then
+    printf '%s%s%s · ' "$gray" "$usage_inline" "$reset"
+fi
 printf '%s%s %s[%s]%s %s%s%%%s' \
     "$gray" "$model_name" \
     "$amber" "$effort_level" "$reset" \
     "$orange" "$context_pct" "$reset"
-
-if [ -n "$usage_plain" ]; then
-    if ((${#usage_plain} > available_columns)); then
-        usage_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
-        if [ -n "$primary_reset" ]; then
-            usage_plain="$usage_plain · $(format_reset_duration "$primary_reset")"
-        fi
-    fi
-    usage_gap=$((available_columns - ${#usage_plain}))
-    if ((usage_gap < 0)); then usage_gap=0; fi
-    printf '\n%s%*s%s%s' "$gray" "$usage_gap" '' "$usage_plain" "$reset"
-fi
