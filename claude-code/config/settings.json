@@ -215,7 +215,7 @@
   "fastMode": false,
   "ultracode": false,
   "theme": "light",
-  "verbose": true,
+  "verbose": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
   "skipDangerousModePermissionPrompt": true,
