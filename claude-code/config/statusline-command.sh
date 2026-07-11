@@ -121,5 +121,5 @@ if [ -n "$usage_plain" ]; then
     fi
     usage_gap=$((available_columns - ${#usage_plain}))
     if ((usage_gap < 0)); then usage_gap=0; fi
-    printf '\n%*s%s%s%s' "$usage_gap" '' "$gray" "$usage_plain" "$reset"
+    printf '\n%s%*s%s%s' "$gray" "$usage_gap" '' "$usage_plain" "$reset"
 fi
