@@ -6,7 +6,11 @@ input=$(cat)
 # extract built-in status fields in one pass
 IFS=$'\t' read -r model_name current_dir context_pct effort_level lines_added lines_removed < <(
     jq -r '[
-        (.model.display_name // "unknown"),
+        ((.model.display_name // "unknown") as $model |
+            if ($model | test("claude|fable|opus|sonnet|haiku"; "i"))
+            then ($model | ascii_downcase)
+            else $model
+            end),
         (.workspace.current_dir // "~"),
         ((.context_window.used_percentage // 0) | floor | tostring),
         (.effort.level // "-"),
