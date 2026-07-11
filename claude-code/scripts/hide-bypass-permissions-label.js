@@ -143,50 +143,6 @@ if (usagePatchCount === 0 && usageComponentCount === 0) {
     );
 }
 
-const modelCachePrefix = '/.cache/harness-statusline/model-header.';
-const modelCacheMarker = `${modelCachePrefix}"+process.pid+".txt`;
-const modelComponentName = 'HarnessModelHeader';
-const modelPatchCount = js.split(modelCacheMarker).length - 1;
-const modelComponentCount = js.split(`function ${modelComponentName}`).length - 1;
-if (modelPatchCount === 0 && modelComponentCount === 0) {
-    const modelHeaderPattern = new RegExp(
-        `(${identifier}=${identifier}!=="invalid"&&${identifier}!=="missing"&&${identifier}&&)(${identifier})\\.jsx\\((${identifier}),\\{children:\\2\\.jsxs\\((${identifier}),\\{dimColor:!0,wrap:"truncate",children:\\[${identifier}," tokens"\\]\\}\\)\\}\\)`,
-        'g'
-    );
-    const modelHeaderMatches = [...js.matchAll(modelHeaderPattern)];
-    if (modelHeaderMatches.length !== 1) {
-        throw new Error(`expected one verbose token header, found ${modelHeaderMatches.length}`);
-    }
-
-    const modelHeaderMatch = modelHeaderMatches[0];
-    const modelReactVariable = modelHeaderMatch[2];
-    const modelBoxVariable = modelHeaderMatch[3];
-    const modelTextVariable = modelHeaderMatch[4];
-    const modelFunctionStart = js.lastIndexOf('function ', modelHeaderMatch.index);
-    if (modelFunctionStart < 0) {
-        throw new Error('could not locate the verbose token header function');
-    }
-
-    const modelFunctionPrefix = js.slice(modelFunctionStart, modelHeaderMatch.index);
-    const modelHooksMatches = [...modelFunctionPrefix.matchAll(new RegExp(`(${identifier})\\.useState\\(`, 'g'))];
-    const modelHooksVariable = modelHooksMatches[0]?.[1];
-    if (!modelHooksVariable || !modelFunctionPrefix.includes(`${modelHooksVariable}.useEffect(`)) {
-        throw new Error('could not locate the verbose token header react hooks');
-    }
-
-    const readModel = `()=>{try{return require("fs").readFileSync(process.env.HOME+"${modelCachePrefix}"+process.pid+".txt","utf8")}catch{return""}}`;
-    const modelComponent = `function ${modelComponentName}(){let[e,t]=${modelHooksVariable}.useState(${readModel});${modelHooksVariable}.useEffect(()=>{let n=setInterval(()=>{let r=(${readModel})();t((o)=>o===r?o:r)},1000);return()=>clearInterval(n)},[]);return e?${modelReactVariable}.jsx(${modelBoxVariable},{children:${modelReactVariable}.jsx(${modelTextVariable},{dimColor:!0,wrap:"truncate",children:e})}):null}`;
-    js = js.slice(0, modelFunctionStart) + modelComponent + js.slice(modelFunctionStart);
-    js = js.replace(
-        modelHeaderPattern,
-        `$1${modelReactVariable}.jsx(${modelComponentName},{})`
-    );
-} else if (modelPatchCount !== 2 || modelComponentCount !== 1) {
-    throw new Error(
-        `expected an unpatched model header or one model component, found ${modelPatchCount} model reads and ${modelComponentCount} components`
-    );
-}
-
 const foregroundAgentMarker = 'harness-hide-fg-agents';
 const foregroundAgentPatchCount = js.split(foregroundAgentMarker).length - 1;
 if (foregroundAgentPatchCount === 0) {
