@@ -88,9 +88,12 @@ if (compactFooterCount !== 1 || expandedFooterCount !== 1) {
     );
 }
 
-const usageCachePath = '/.cache/harness-statusline/footer-usage.txt';
-const usagePatchCount = js.split(usageCachePath).length - 1;
-if (usagePatchCount === 0) {
+const usageCachePrefix = '/.cache/harness-statusline/footer-usage.';
+const usageCacheMarker = `${usageCachePrefix}"+process.pid+".txt`;
+const usageComponentName = 'HarnessFooterUsage';
+const usagePatchCount = js.split(usageCacheMarker).length - 1;
+const usageComponentCount = js.split(`function ${usageComponentName}`).length - 1;
+if (usagePatchCount === 0 && usageComponentCount === 0) {
     const firstFooterLabel = [...js.matchAll(patchedPattern)][0];
     const footerPrefix = js.slice(Math.max(0, firstFooterLabel.index - 500), firstFooterLabel.index);
     const modeRendererPattern = new RegExp(
@@ -118,9 +121,24 @@ if (usagePatchCount === 0) {
         throw new Error('could not locate both footer root layouts');
     }
 
+    const footerFunctionStart = js.lastIndexOf('function ', compactRoot.index);
+    if (footerFunctionStart < 0) {
+        throw new Error('could not locate the footer function');
+    }
+
+    const footerFunctionPrefix = js.slice(footerFunctionStart, compactRoot.index);
+    const hooksMatches = [...footerFunctionPrefix.matchAll(new RegExp(`(${identifier})\\.useState\\(`, 'g'))];
+    const hooksVariable = hooksMatches[0]?.[1];
+    if (!hooksVariable || !footerFunctionPrefix.includes(`${hooksVariable}.useEffect(`)) {
+        throw new Error('could not locate the footer react hooks');
+    }
+
+    const readUsage = `()=>{try{return require("fs").readFileSync(process.env.HOME+"${usageCachePrefix}"+process.pid+".txt","utf8")}catch{return""}}`;
+    const usageComponent = `function ${usageComponentName}(){let[e,t]=${hooksVariable}.useState(${readUsage});${hooksVariable}.useEffect(()=>{let n=setInterval(()=>{let r=(${readUsage})();t((o)=>o===r?o:r)},1000);return()=>clearInterval(n)},[]);return ${reactVariable}.jsx(${textVariable},{dimColor:!0,wrap:"truncate",children:e})}`;
+    js = js.slice(0, footerFunctionStart) + usageComponent + js.slice(footerFunctionStart);
+
     const makeUsageChildren = (boxVariable) => {
-        const usageValue = `(()=>{try{return require("fs").readFileSync(process.env.HOME+"${usageCachePath}","utf8")}catch{return""}})()`;
-        return `${reactVariable}.jsx(${boxVariable},{flexGrow:1}),${reactVariable}.jsx(${boxVariable},{flexShrink:100,marginLeft:1,children:${reactVariable}.jsx(${textVariable},{dimColor:!0,wrap:"truncate",children:${usageValue}})})`;
+        return `${reactVariable}.jsx(${boxVariable},{flexGrow:1}),${reactVariable}.jsx(${boxVariable},{flexShrink:100,marginLeft:1,children:${reactVariable}.jsx(${usageComponentName},{})})`;
     };
     js = js.replace(
         compactRootPattern,
@@ -130,8 +148,10 @@ if (usagePatchCount === 0) {
         expandedRootPattern,
         `${reactVariable}.jsxs($1,{height:1,overflow:"hidden",children:[$2,${makeUsageChildren(expandedRoot[1])}]})`
     );
-} else if (usagePatchCount !== 2) {
-    throw new Error(`expected zero or two footer usage patches, found ${usagePatchCount}`);
+} else if (usagePatchCount !== 2 || usageComponentCount !== 1) {
+    throw new Error(
+        `expected an unpatched footer or one usage component, found ${usagePatchCount} usage reads and ${usageComponentCount} components`
+    );
 }
 
 const foregroundAgentMarker = 'harness-hide-fg-agents';

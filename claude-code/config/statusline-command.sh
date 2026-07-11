@@ -85,7 +85,7 @@ if [ -x "$usage_helper" ]; then
 fi
 
 usage_cache_dir="$HOME/.cache/harness-statusline"
-usage_cache_file="$usage_cache_dir/footer-usage.txt"
+usage_cache_file="$usage_cache_dir/footer-usage.$PPID.txt"
 mkdir -p "$usage_cache_dir"
 if [ ! -f "$usage_cache_file" ] || [ "$(<"$usage_cache_file")" != "$usage_plain" ]; then
     umask 077
