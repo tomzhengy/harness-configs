@@ -88,4 +88,50 @@ if (compactFooterCount !== 1 || expandedFooterCount !== 1) {
     );
 }
 
+const usageCachePath = '/.cache/harness-statusline/footer-usage.txt';
+const usagePatchCount = js.split(usageCachePath).length - 1;
+if (usagePatchCount === 0) {
+    const firstFooterLabel = [...js.matchAll(patchedPattern)][0];
+    const footerPrefix = js.slice(Math.max(0, firstFooterLabel.index - 500), firstFooterLabel.index);
+    const modeRendererPattern = new RegExp(
+        `(${identifier})\\.jsxs\\((${identifier}),\\{color:${identifier}\\(${identifier}\\),children:\\[`,
+        'g'
+    );
+    const modeRenderers = [...footerPrefix.matchAll(modeRendererPattern)];
+    const modeRenderer = modeRenderers[modeRenderers.length - 1];
+    if (!modeRenderer) {
+        throw new Error('could not locate the footer react and text components');
+    }
+
+    const reactVariable = modeRenderer[1];
+    const textVariable = modeRenderer[2];
+    const escapedReactVariable = reactVariable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const compactRootPattern = new RegExp(
+        `${escapedReactVariable}\\.jsxs\\((${identifier}),\\{height:1,overflow:"hidden",children:\\[(${identifier},${identifier},${identifier},${identifier},${identifier}),null\\]\\}\\)`
+    );
+    const expandedRootPattern = new RegExp(
+        `${escapedReactVariable}\\.jsxs\\((${identifier}),\\{height:1,overflow:"hidden",children:\\[(${identifier}(?:,${identifier}){6})\\]\\}\\)`
+    );
+    const compactRoot = js.match(compactRootPattern);
+    const expandedRoot = js.match(expandedRootPattern);
+    if (!compactRoot || !expandedRoot) {
+        throw new Error('could not locate both footer root layouts');
+    }
+
+    const makeUsageChildren = (boxVariable) => {
+        const usageValue = `(()=>{try{return require("fs").readFileSync(process.env.HOME+"${usageCachePath}","utf8")}catch{return""}})()`;
+        return `${reactVariable}.jsx(${boxVariable},{flexGrow:1}),${reactVariable}.jsx(${boxVariable},{flexShrink:100,marginLeft:1,children:${reactVariable}.jsx(${textVariable},{dimColor:!0,wrap:"truncate",children:${usageValue}})})`;
+    };
+    js = js.replace(
+        compactRootPattern,
+        `${reactVariable}.jsxs($1,{height:1,overflow:"hidden",children:[$2,${makeUsageChildren(compactRoot[1])}]})`
+    );
+    js = js.replace(
+        expandedRootPattern,
+        `${reactVariable}.jsxs($1,{height:1,overflow:"hidden",children:[$2,${makeUsageChildren(expandedRoot[1])}]})`
+    );
+} else if (usagePatchCount !== 2) {
+    throw new Error(`expected zero or two footer usage patches, found ${usagePatchCount}`);
+}
+
 return js;

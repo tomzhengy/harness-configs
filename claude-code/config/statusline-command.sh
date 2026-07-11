@@ -84,33 +84,26 @@ if [ -x "$usage_helper" ]; then
     fi
 fi
 
+usage_cache_dir="$HOME/.cache/harness-statusline"
+usage_cache_file="$usage_cache_dir/footer-usage.txt"
+mkdir -p "$usage_cache_dir"
+if [ ! -f "$usage_cache_file" ] || [ "$(<"$usage_cache_file")" != "$usage_plain" ]; then
+    umask 077
+    usage_cache_tmp="$usage_cache_file.$$"
+    printf '%s' "$usage_plain" > "$usage_cache_tmp"
+    mv "$usage_cache_tmp" "$usage_cache_file"
+fi
+
 # build plain text first so right alignment ignores ansi color sequences
 left_plain="$dir_basename"
 left_plain="$left_plain +$lines_added -$lines_removed"
-model_plain="$model_name [$effort_level] $context_pct%"
-right_plain="$model_plain"
+right_plain="$model_name [$effort_level] $context_pct%"
 
 columns=${COLUMNS:-120}
 available_columns=$((columns - 4))
 if ((available_columns < 1)); then
     available_columns=$columns
 fi
-
-usage_inline=""
-if [ -n "$usage_plain" ]; then
-    full_right_plain="$usage_plain · $model_plain"
-    if ((${#left_plain} + ${#full_right_plain} + 1 <= available_columns)); then
-        usage_inline="$usage_plain"
-        right_plain="$full_right_plain"
-    elif [ -n "$session_plain" ]; then
-        session_right_plain="$session_plain · $model_plain"
-        if ((${#left_plain} + ${#session_right_plain} + 1 <= available_columns)); then
-            usage_inline="$session_plain"
-            right_plain="$session_right_plain"
-        fi
-    fi
-fi
-
 gap=$((available_columns - ${#left_plain} - ${#right_plain}))
 if ((gap < 1)); then
     gap=1
@@ -126,9 +119,6 @@ red=$'\033[38;5;203m'
 printf '%s%s%s' "$orange" "$dir_basename" "$reset"
 printf ' %s+%s%s %s-%s%s' "$green" "$lines_added" "$reset" "$red" "$lines_removed" "$reset"
 printf '%*s' "$gap" ''
-if [ -n "$usage_inline" ]; then
-    printf '%s%s%s · ' "$gray" "$usage_inline" "$reset"
-fi
 printf '%s%s %s[%s]%s %s%s%%%s' \
     "$gray" "$model_name" \
     "$amber" "$effort_level" "$reset" \
