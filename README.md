@@ -171,68 +171,6 @@ if prompted, run `codex` once and complete sign-in. keep your env vars loaded be
 this repo targets the newer codex harness layout built around `AGENTS.md`, `rules/`, and `skills/`.
 codex-managed system skills should stay in `~/.codex/skills/.system`, not in this repo.
 
-### 3. runpod / docker gpu setup
-
-for running claude code on a remote GPU instance (runpod, etc.):
-
-**option a: docker image on runpod**
-
-1. build and push the image to docker hub (or any registry runpod can pull from):
-
-```bash
-cd gpu-setup
-docker build -t <your-dockerhub-username>/claude-gpu .
-docker push <your-dockerhub-username>/claude-gpu
-```
-
-2. create a runpod template:
-
-   - go to [runpod.io/console/user/templates](https://www.runpod.io/console/user/templates) and click **new template**
-   - **template name**: `claude-gpu` (or whatever you want)
-   - **container image**: `<your-dockerhub-username>/claude-gpu`
-   - **container disk**: 20 GB (enough for deps and models)
-   - **volume disk**: 50+ GB (mounted at `/workspace`, persists across restarts)
-   - **volume mount path**: `/workspace`
-   - **expose http ports**: `8888` (optional, for jupyter)
-   - **expose tcp ports**: `22` (for ssh)
-   - **environment variables**:
-
-     | variable                       | required | description               |
-     | ------------------------------ | -------- | ------------------------- |
-     | `ANTHROPIC_API_KEY`            | yes      | claude api key            |
-     | `GITHUB_PERSONAL_ACCESS_TOKEN` | no       | enables github MCP server |
-     | `NIA_API_KEY`                  | no       | enables nia MCP server    |
-
-   - leave **docker command** empty (the image uses its own entrypoint)
-   - click **save template**
-
-3. deploy a pod using the template:
-
-   - go to **pods** > **deploy** and select your `claude-gpu` template
-   - pick a GPU
-   - click **deploy**
-   - once running, grab the ssh command from the pod's **connect** menu
-   - ssh in and run `claude`
-
-the image is based on `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404` and adds: bun, uv, pipx, claude code, and sshd. on boot, `bootstrap.sh` clones this config repo to `/workspace`, sets up symlinks, configures MCP servers, and strips macOS-only hooks (sound notifications, swift-lsp plugin).
-
-**option b: bootstrap script on an existing instance**
-
-if you already have a GPU instance running, just curl the bootstrap script:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/tomzhengy/harness-configs/main/gpu-setup/bootstrap.sh | bash
-```
-
-this installs everything and sets up config. it's idempotent so you can run it again after a restart.
-
-**notes:**
-
-- `/workspace` is used for persistent storage on runpod (survives restarts)
-- claude oauth session is persisted to `/workspace/.claude.json`
-- macOS-only hooks (afplay sounds, swift-lsp) are auto-stripped from settings.json
-- `settings.json` is generated (not symlinked) so linux-incompatible entries don't break things
-
 ### clipaste (paste images into claude code over ssh)
 
 claude code can't paste clipboard images when it runs on a remote machine over ssh -
@@ -318,11 +256,6 @@ codex/
     code-simplifier/       # manual-use only simplification skill
     thermo-nuclear-code-quality-review/
                             # manual-use strict maintainability review skill
-
-gpu-setup/
-  Dockerfile                # runpod pytorch gpu environment
-  bootstrap.sh              # system setup script
-  entrypoint.sh             # container entrypoint
 
 clipaste/
   setup-local.sh           # local-side installer for clipboard image paste over ssh
