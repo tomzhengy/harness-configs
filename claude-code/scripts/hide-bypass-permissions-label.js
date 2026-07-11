@@ -34,57 +34,46 @@ if (originalMatches.length === 2 && patchedMatches.length === 0) {
 
 const identifier = '[A-Za-z_$][\\w$]*';
 const footerLabels = [...js.matchAll(patchedPattern)].sort((a, b) => b.index - a.index);
-let compactFooterCount = 0;
-let expandedFooterCount = 0;
+let hiddenCycleHintCount = 0;
 
 for (const footerLabel of footerLabels) {
     const modeVariable = footerLabel[1];
     const escapedModeVariable = modeVariable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const suffixStart = footerLabel.index + footerLabel[0].length;
-    const suffix = js.slice(suffixStart, suffixStart + 200);
-    const compactPatched = new RegExp(
+    const suffix = js.slice(suffixStart, suffixStart + 500);
+    const hiddenPattern = /^,null(?=\]\},"mode")/;
+    const compactBypassOnlyPattern = new RegExp(
         `^,${escapedModeVariable}==="bypassPermissions"\\?null:${identifier}(?=\\]\\},"mode")`
     );
-    const compactOriginal = new RegExp(`^,(${identifier})(?=\\]\\},"mode")`);
-    const expandedPatched = new RegExp(
-        `^,${escapedModeVariable}!=="bypassPermissions"&&${identifier}&&${identifier}&&`
+    const compactOriginalPattern = new RegExp(`^,${identifier}(?=\\]\\},"mode")`);
+    const expandedHint = `${identifier}&&${identifier}&&${identifier}\\.jsxs\\(${identifier},\\{dimColor:!0,children:\\[" ",${identifier}\\.jsx\\(${identifier},\\{chord:${identifier},action:"cycle",parens:!0,format:\\{keyCase:"lower"\\}\\}\\)\\]\\}\\)`;
+    const expandedBypassOnlyPattern = new RegExp(
+        `^,${escapedModeVariable}!=="bypassPermissions"&&${expandedHint}`
     );
-    const expandedOriginal = new RegExp(`^,(${identifier}&&${identifier}&&)`);
-    let match = suffix.match(compactPatched);
+    const expandedOriginalPattern = new RegExp(`^,${expandedHint}`);
+    let match = suffix.match(hiddenPattern);
 
     if (match) {
-        compactFooterCount += 1;
+        hiddenCycleHintCount += 1;
         continue;
     }
 
-    match = suffix.match(compactOriginal);
+    match = suffix.match(compactBypassOnlyPattern)
+        ?? suffix.match(compactOriginalPattern)
+        ?? suffix.match(expandedBypassOnlyPattern)
+        ?? suffix.match(expandedOriginalPattern);
     if (match) {
-        const replacement = `,${modeVariable}==="bypassPermissions"?null:${match[1]}`;
-        js = js.slice(0, suffixStart) + replacement + js.slice(suffixStart + match[0].length);
-        compactFooterCount += 1;
-        continue;
-    }
-
-    match = suffix.match(expandedPatched);
-    if (match) {
-        expandedFooterCount += 1;
-        continue;
-    }
-
-    match = suffix.match(expandedOriginal);
-    if (match) {
-        const replacement = `,${modeVariable}!=="bypassPermissions"&&${match[1]}`;
-        js = js.slice(0, suffixStart) + replacement + js.slice(suffixStart + match[0].length);
-        expandedFooterCount += 1;
+        js = js.slice(0, suffixStart) + ',null' + js.slice(suffixStart + match[0].length);
+        hiddenCycleHintCount += 1;
         continue;
     }
 
     throw new Error('could not locate the bypass permission cycle hint');
 }
 
-if (compactFooterCount !== 1 || expandedFooterCount !== 1) {
+if (hiddenCycleHintCount !== 2) {
     throw new Error(
-        `expected one compact and one expanded footer, found ${compactFooterCount} compact and ${expandedFooterCount} expanded`
+        `expected two hidden permission cycle hints, found ${hiddenCycleHintCount}`
     );
 }
 
