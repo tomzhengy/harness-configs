@@ -32,7 +32,7 @@ if [ -n "$git_branch" ]; then
     left_plain="$left_plain ($git_branch)"
 fi
 left_plain="$left_plain +$lines_added -$lines_removed"
-right_plain="$model_name [$effort_level] [$context_pct%]"
+right_plain="$model_name [$effort_level] $context_pct%"
 
 columns=${COLUMNS:-120}
 available_columns=$((columns - 4))
@@ -57,7 +57,7 @@ if [ -n "$git_branch" ]; then
 fi
 printf ' %s+%s%s %s-%s%s' "$green" "$lines_added" "$reset" "$red" "$lines_removed" "$reset"
 printf '%*s' "$gap" ''
-printf '%s%s %s[%s]%s %s[%s%%]%s' \
+printf '%s%s %s[%s]%s %s%s%%%s' \
     "$gray" "$model_name" \
     "$amber" "$effort_level" "$reset" \
     "$orange" "$context_pct" "$reset"
