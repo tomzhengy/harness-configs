@@ -67,7 +67,7 @@ if [ -x "$usage_helper" ]; then
             primary_pct=$(printf '%.0f' "$primary_pct")
             usage_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
             if [ -n "$primary_reset" ]; then
-                usage_plain="$usage_plain · Reset: $(format_reset_duration "$primary_reset")"
+                usage_plain="$usage_plain · $(format_reset_duration "$primary_reset")"
             fi
         fi
 
@@ -75,7 +75,7 @@ if [ -x "$usage_helper" ]; then
             secondary_pct=$(printf '%.0f' "$secondary_pct")
             weekly_plain="Weekly: [$(make_usage_bar "$secondary_pct")] $secondary_pct%"
             if [ -n "$secondary_reset" ]; then
-                weekly_plain="$weekly_plain · Weekly reset: $(format_reset_duration "$secondary_reset")"
+                weekly_plain="$weekly_plain · $(format_reset_duration "$secondary_reset")"
             fi
             usage_plain="${usage_plain:+$usage_plain · }$weekly_plain"
         fi
@@ -116,7 +116,7 @@ if [ -n "$usage_plain" ]; then
     if ((${#usage_plain} > available_columns)); then
         usage_plain="Session: [$(make_usage_bar "$primary_pct")] $primary_pct%"
         if [ -n "$primary_reset" ]; then
-            usage_plain="$usage_plain · Reset: $(format_reset_duration "$primary_reset")"
+            usage_plain="$usage_plain · $(format_reset_duration "$primary_reset")"
         fi
     fi
     usage_gap=$((available_columns - ${#usage_plain}))
