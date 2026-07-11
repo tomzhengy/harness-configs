@@ -134,4 +134,28 @@ if (usagePatchCount === 0) {
     throw new Error(`expected zero or two footer usage patches, found ${usagePatchCount}`);
 }
 
+const foregroundAgentMarker = 'harness-hide-fg-agents';
+const foregroundAgentPatchCount = js.split(foregroundAgentMarker).length - 1;
+if (foregroundAgentPatchCount === 0) {
+    const foregroundAgentPattern = new RegExp(
+        `(${identifier})=${identifier}&&!${identifier}\\?${identifier}\\.jsx\\(${identifier},\\{\\},"fg-agents"\\):null`,
+        'g'
+    );
+    const foregroundAgentMatches = [...js.matchAll(foregroundAgentPattern)];
+    if (foregroundAgentMatches.length !== 1) {
+        throw new Error(
+            `expected one foreground agent hint, found ${foregroundAgentMatches.length}`
+        );
+    }
+
+    js = js.replace(
+        foregroundAgentPattern,
+        '$1=null/* harness-hide-fg-agents */'
+    );
+} else if (foregroundAgentPatchCount !== 1) {
+    throw new Error(
+        `expected zero or one foreground agent hint patches, found ${foregroundAgentPatchCount}`
+    );
+}
+
 return js;
