@@ -77,6 +77,36 @@ if (hiddenCycleHintCount !== 2) {
     );
 }
 
+const bypassSeparatorMarker = 'harness-hide-bypass-separator';
+const bypassSeparatorPatchCount = js.split(bypassSeparatorMarker).length - 1;
+if (bypassSeparatorPatchCount === 0) {
+    const modeVariables = new Set([...js.matchAll(patchedPattern)].map((match) => match[1]));
+    if (modeVariables.size !== 1) {
+        throw new Error(`expected one footer mode variable, found ${modeVariables.size}`);
+    }
+
+    const [modeVariable] = modeVariables;
+    const modeSeparatorPattern = new RegExp(
+        `(${identifier})=(${identifier})&&(${identifier})\\.jsxs\\((${identifier}),\\{flexShrink:0,children:\\[\\2,\\((null\\|\\|[^)]*)\\)&&\\3\\.jsx\\((${identifier}),\\{dimColor:!0,children:" \\\\xB7 "\\}\\)\\]\\}\\)`,
+        'g'
+    );
+    const modeSeparatorMatches = [...js.matchAll(modeSeparatorPattern)];
+    if (modeSeparatorMatches.length !== 2) {
+        throw new Error(`expected two permission mode separators, found ${modeSeparatorMatches.length}`);
+    }
+
+    js = js.replace(
+        modeSeparatorPattern,
+        (_, assignment, modeNode, reactVariable, boxVariable, separatorCondition, textVariable) => (
+            `${assignment}=${modeNode}&&${reactVariable}.jsxs(${boxVariable},{flexShrink:0,children:[${modeNode},${modeVariable}!=="bypassPermissions"&&(${separatorCondition})&&${reactVariable}.jsx(${textVariable},{dimColor:!0,children:" \\xB7 "})/* harness-hide-bypass-separator */]})`
+        )
+    );
+} else if (bypassSeparatorPatchCount !== 2) {
+    throw new Error(
+        `expected zero or two bypass separator patches, found ${bypassSeparatorPatchCount}`
+    );
+}
+
 const usageCachePrefix = '/.cache/harness-statusline/footer-usage.';
 const usageCacheMarker = `${usageCachePrefix}"+process.pid+".txt`;
 const usageComponentName = 'HarnessFooterUsage';
