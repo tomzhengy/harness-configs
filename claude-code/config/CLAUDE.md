@@ -119,7 +119,7 @@ How to apply:
 - Reviews of plans and implementations: fable-5 or opus-4.8, optionally a direct gpt-5.6-sol worker as an independent perspective.
 - Never use Haiku.
 - Direct routing: gpt-5.6-sol is available to subagents through the configured CLIProxyAPI gateway. Use the `codex-implementation` and `codex-review` skills for direct Sol delegation. Do not wrap Sol inside Sonnet and do not use `codex exec` or `codex review` for ordinary implementation, investigation, analysis, or review.
-- Fan-out: for implementation or analysis workflows, explicitly use `sol-worker` or set every worker's model to `gpt-5.6-sol`. Do not leave the worker model implicit, because dynamic workflows may otherwise choose an Anthropic model.
+- Fan-out: for implementation or analysis workflows, use `sol-worker`, which defaults to `effort: "high"`, even when the parent runs in ultracode. If creating a direct worker instead, explicitly set both `model: "gpt-5.6-sol"` and `effort: "high"`. Do not leave either value implicit. A deliberate per-worker effort override is allowed when the task warrants it.
 - Prompts for delegated workers must be self-contained: include the goal, exact requirements, relevant paths, constraints, and done criteria.
 - Parallel workers that write files must use `isolation: "worktree"` so edits do not collide. Read-only investigation and review workers do not need worktree isolation.
 - Keep `codex-computer-use` for tasks that specifically require Codex CLI computer-use or browser-use features.

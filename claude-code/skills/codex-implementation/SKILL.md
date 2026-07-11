@@ -15,7 +15,7 @@ Give the worker a self-contained assignment:
 - commands to validate the result
 - concrete done criteria
 
-Use `effort: "high"` by default. Use `xhigh` or `max` for unusually hard work, and lower effort for bounded mechanical tasks.
+Use `effort: "high"` by default, including when the parent session runs in ultracode. Do not inherit the parent's `xhigh` effort implicitly. Use `xhigh` or `max` for unusually hard work, and lower effort for bounded mechanical tasks, only when the worker invocation deliberately specifies that override.
 
 For parallel workers that write files, use `isolation: "worktree"`. Read-only investigation and analysis workers do not need worktree isolation.
 
