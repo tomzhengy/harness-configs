@@ -1,62 +1,21 @@
 ---
 name: codex-review
-description: Ask Codex CLI (gpt-5.6-sol) for an independent code review of uncommitted changes, a branch diff, a commit, or a specific implementation. This is how gpt-5.6-sol is invoked for review work. Use when the user asks Claude to have Codex or gpt-5.6-sol review work, when the model-selection rubric calls for a gpt-5.6-sol review perspective, or when Codex should audit a diff, find bugs or regressions, or compare Claude's implementation against requirements. For a review by Claude itself, use the normal review process instead.
-allowed-tools: Bash(codex:*), Bash(mktemp:*)
+description: Ask a direct gpt-5.6-sol subagent for an independent review of uncommitted changes, a branch diff, a commit, or a specific implementation. Use when a second review perspective is useful.
 ---
 
-# Codex Review
+# Direct Sol review
 
-Use Codex as an independent reviewer when the user wants a second-pass review or when a change is broad enough that another agent's perspective is useful.
+Spawn the `sol-worker` subagent or a general-purpose Agent/Workflow worker with `model: "gpt-5.6-sol"` and `effort: "high"`. Do not use a Sonnet wrapper, temporary prompt files, or `codex review`.
 
-Prefer Claude's normal review process for small local checks. Do not delegate review just to avoid reading the code yourself. Treat Codex's output as evidence, not authority.
+The assignment must be read-only and name the exact review target. Include task requirements, risky areas, expected behavior, relevant tests, and any files the orchestrator is unsure about.
 
-## Workflow
+Ask the worker to prioritize findings over summary. Each finding should include:
 
-non-destructive and read-only. write custom review instructions (focus areas, context) to "$PROMPT" before running; the review lands in "$REPORT".
-
-run the whole sequence (mktemp, write "$PROMPT", run codex review, read "$REPORT") inside a sonnet wrapper subagent labeled `gpt-5.6-sol:review-<topic>` - it shows up in the UI as a monitorable agent and doesn't block the main session.
-
-Use one of these command shapes:
-
-```bash
-ARTIFACT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/codex-review.XXXXXX")"
-REPORT="$ARTIFACT_DIR/report.md"
-PROMPT="$ARTIFACT_DIR/prompt.md"
-
-# Review staged, unstaged, and untracked changes.
-codex -C "$PWD" review --uncommitted - < "$PROMPT" > "$REPORT"
-
-# Review current branch against a base branch.
-codex -C "$PWD" review --base main - < "$PROMPT" > "$REPORT"
-
-# Review a single commit.
-codex -C "$PWD" review --commit <sha> - < "$PROMPT" > "$REPORT"
-```
-
-## Review Prompt
-
-Ask Codex to use a code-review stance:
-
-```text
-Review these changes for bugs, regressions, missing tests, security issues, and requirement mismatches.
-
-Prioritize findings over summary. For each finding include:
 - severity
 - file and line reference
 - concrete failure mode
 - suggested fix direction
 
-Do not edit files. If there are no substantive findings, say so and name any residual test gaps.
-```
+The worker must not edit files. If there are no substantive findings, it should say so and identify any remaining test gaps.
 
-Add task-specific context when useful: requirements, risky areas, expected behavior, relevant tests, or files Claude is unsure about.
-
-treat findings as one independent perspective: verify each claim against the code before acting on it, and cross-check anything surprising with a fable-5 or opus-4.8 review.
-
-## Reporting Back
-
-Before relaying a Codex finding, inspect the cited code or diff enough to decide whether the finding is real. In the user-facing response, separate confirmed issues from Codex suggestions you did not verify.
-
-If Codex finds nothing, say that clearly and mention what review target it inspected.
-
-If `codex` is not installed or the command fails, report the error and offer to review the changes directly instead.
+Treat the result as one independent perspective. Inspect cited code before relaying a finding, separate confirmed issues from unverified suggestions, and cross-check surprising claims with Fable 5 or Opus 4.8.

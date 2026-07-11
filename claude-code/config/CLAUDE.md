@@ -114,21 +114,15 @@ How to apply:
 
 - These are defaults, not limits. You have standing permission to override them: if a cheaper model's output doesn't meet the bar, rerun or redo the work with a smarter model without asking. Judge the output, not the price tag. Escalating costs less than shipping mediocre work.
 - Don't let cost prevent you from using the right model for the job. Instead, take advantage of cheaper options to get more information and try things before moving the work to a more expensive and capable option.
-- Writing code: gpt-5.6-sol is the DEFAULT implementer, not a fallback - it matches fable-5 on intelligence and is effectively free. Delegate implementation, migrations, tests, experiments, and data analysis to it by default; fable-5 orchestrates instead of typing: scope the work, write the codex prompt, review the diff, integrate. Fable-5 writes code itself only when the surface is taste-critical (UI, copy, API design), the edit is too small to be worth a handoff, or gpt-5.6-sol already missed the bar on that piece.
+- Writing code: gpt-5.6-sol is the DEFAULT implementer, not a fallback. Delegate implementation, migrations, tests, experiments, investigation, and data analysis directly to the `sol-worker` subagent or an Agent/Workflow worker with `model: "gpt-5.6-sol"`. Fable-5 orchestrates, reviews the diff, and integrates. Fable-5 writes code itself only when the surface is taste-critical, the edit is too small to justify delegation, or Sol already missed the bar.
 - Anything user-facing (UI, copy, API design) needs taste ≥ 7.
-- Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.6-sol as an extra independent perspective.
+- Reviews of plans and implementations: fable-5 or opus-4.8, optionally a direct gpt-5.6-sol worker as an independent perspective.
 - Never use Haiku.
-- Mechanics: gpt-5.6-sol is only reachable through the Codex CLI - `codex exec` / `codex review` (my ~/.codex/config.toml defaults to gpt-5.6-sol at xhigh reasoning effort). Use the codex-implementation, codex-review, and codex-computer-use skills; for work they don't cover (investigation, data analysis), run `codex exec --skip-git-repo-check -s read-only "<PROMPT>"` directly with a self-contained prompt. Always pass `--skip-git-repo-check` to `codex exec` - without it codex refuses untrusted non-git directories.
-- Claude models (opus-4.8, fable-5) run via the Agent/Workflow model parameter.
-- Visibility: NEVER run `codex exec` inline via Bash in the main session. Always hand it to a sonnet wrapper subagent (pattern below) so the codex run shows up as a monitorable agent in the UI instead of a silent shell command. This applies to every codex run, not just workflows.
-
-Using gpt-5.6-sol - always through a wrapper subagent, whether ad hoc (Agent tool) or in workflows (the model parameter only takes Claude models, and inline Bash runs are invisible to the user):
-
-- Spawn a thin Claude wrapper agent with `model: 'sonnet', effort: 'low'` whose prompt instructs it to write a self-contained codex prompt, run `codex exec --skip-git-repo-check` via Bash, and return the report (use `schema` on the wrapper to get structured output back).
-- Always label these agents with a `gpt-5.6-sol:` prefix, e.g. `{label: 'gpt-5.6-sol:review-auth'}` - the workflow UI shows the wrapper's Claude model, so the label is the only indication the real worker is gpt-5.6-sol.
-- Codex runs can exceed Bash's 10-minute timeout: pass an explicit timeout, or run in the background and poll for the report file.
-- Parallel gpt-5.6-sol implementation agents must use `isolation: 'worktree'` so codex edits don't collide in the shared checkout.
-- Workflow token budgets only count Claude tokens; codex work is free and invisible to `budget.spent()`.
+- Direct routing: gpt-5.6-sol is available to subagents through the configured CLIProxyAPI gateway. Use the `codex-implementation` and `codex-review` skills for direct Sol delegation. Do not wrap Sol inside Sonnet and do not use `codex exec` or `codex review` for ordinary implementation, investigation, analysis, or review.
+- Fan-out: for implementation or analysis workflows, explicitly use `sol-worker` or set every worker's model to `gpt-5.6-sol`. Do not leave the worker model implicit, because dynamic workflows may otherwise choose an Anthropic model.
+- Prompts for delegated workers must be self-contained: include the goal, exact requirements, relevant paths, constraints, and done criteria.
+- Parallel workers that write files must use `isolation: "worktree"` so edits do not collide. Read-only investigation and review workers do not need worktree isolation.
+- Keep `codex-computer-use` for tasks that specifically require Codex CLI computer-use or browser-use features.
 
 ## canary
 

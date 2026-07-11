@@ -64,7 +64,7 @@ echo "=================================="
 echo ""
 
 # create target directories
-mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills" "$CLAUDE_DIR/scripts"
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/agents" "$CLAUDE_DIR/rules" "$CLAUDE_DIR/skills" "$CLAUDE_DIR/scripts"
 
 # --- settings.json ---
 echo "settings.json:"
@@ -235,6 +235,20 @@ for file in "$SRC_DIR/scripts/"*; do
     install_file "$file" "$CLAUDE_DIR/scripts/$(basename "$file")"
     chmod +x "$CLAUDE_DIR/scripts/$(basename "$file")"
 done
+echo ""
+
+# --- agents ---
+echo "agents:"
+if [ "$MODE" = "link" ]; then
+    rm -rf "$CLAUDE_DIR/agents"
+    ln -sfn "$SRC_DIR/agents" "$CLAUDE_DIR/agents"
+    echo "  linked agents/"
+else
+    for file in "$SRC_DIR/agents/"*; do
+        [ -f "$file" ] || continue
+        install_file "$file" "$CLAUDE_DIR/agents/$(basename "$file")"
+    done
+fi
 echo ""
 
 # --- skills ---

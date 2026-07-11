@@ -1,16 +1,22 @@
 ---
 name: codex-implementation
-description: Delegate code writing and bulk work (implementation, migrations, tests, data analysis, investigation) to gpt-5.6-sol via codex exec. This is the DEFAULT way to write code - gpt-5.6-sol matches Claude's intelligence and is effectively free, so Claude orchestrates and reviews instead of typing the code itself. Only skip delegation for taste-critical surfaces (UI, copy, API design) or edits too small to be worth a handoff.
-allowed-tools: Bash(codex exec:*), Agent
+description: Delegate implementation, migrations, tests, experiments, investigation, and data analysis directly to a gpt-5.6-sol subagent. This is the default implementation path when taste-sensitive design is not the primary constraint.
 ---
 
-always run codex through a thin sonnet wrapper subagent (Agent tool, `model: 'sonnet'`, `effort: 'low'`, label prefixed `gpt-5.6-sol:`) rather than inline Bash in the main session - inline runs are invisible; wrapper subagents show up in the UI so the user can monitor progress.
+# Direct Sol implementation
 
-codex shares no context with this session or the wrapper. write a fully self-contained prompt: goal, exact spec, relevant file paths, constraints, and done criteria.
+Spawn the `sol-worker` subagent or a general-purpose Agent/Workflow worker with `model: "gpt-5.6-sol"`. Do not use a Sonnet wrapper and do not launch `codex exec` for ordinary delegated work.
 
-- implementation (writes files): `codex exec --skip-git-repo-check -s workspace-write "<prompt>"`
-- investigation / data analysis (no writes): `codex exec --skip-git-repo-check -s read-only "<prompt>"`
-- always pass `--skip-git-repo-check`: without it codex refuses to run in untrusted non-git directories (e.g. tmp scratch dirs).
-- useful flags: `--cd <dir>` to set the working root, `-o <file>` to capture the final message, `-m <model>` to override the model (config.toml already defaults to gpt-5.6-sol).
+Give the worker a self-contained assignment:
 
-after it finishes: read the diff (`git diff`), run the tests, and judge the output. if it misses the bar, redo the work with fable-5 or opus-4.8 instead of re-prompting codex endlessly.
+- goal and exact requirements
+- relevant file paths and repository context
+- constraints and invariants
+- commands to validate the result
+- concrete done criteria
+
+Use `effort: "high"` by default. Use `xhigh` or `max` for unusually hard work, and lower effort for bounded mechanical tasks.
+
+For parallel workers that write files, use `isolation: "worktree"`. Read-only investigation and analysis workers do not need worktree isolation.
+
+After the worker finishes, inspect the diff, run the relevant tests, and judge the output. If it misses the bar, escalate to Fable 5 or Opus 4.8 instead of repeatedly prompting the same worker.
