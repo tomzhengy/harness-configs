@@ -49,3 +49,9 @@ trust_level = "trusted"
 
 [projects."/Users/minitom/workspaces/freesolo-co/flash"]
 trust_level = "trusted"
+
+[projects."/Users/minitom/workspaces/freesolo-co/flash-testing"]
+trust_level = "trusted"
+
+[projects."/Users/minitom/workspaces/config"]
+trust_level = "trusted"
