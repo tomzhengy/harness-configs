@@ -108,8 +108,7 @@
     "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "GPT-5.6 Sol",
     "ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION": "GPT-5.6 Sol through local CLIProxyAPI",
     "ANTHROPIC_CUSTOM_MODEL_OPTION_SUPPORTED_CAPABILITIES": "effort,xhigh_effort,max_effort,thinking,adaptive_thinking,interleaved_thinking",
-    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "372000",
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "150000"
+    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "372000"
   },
   "effortLevel": "high",
   "hooks": {

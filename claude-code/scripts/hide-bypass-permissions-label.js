@@ -33,6 +33,65 @@ if (originalMatches.length === 2 && patchedMatches.length === 0) {
 }
 
 const identifier = '[A-Za-z_$][\\w$]*';
+const solAutoCompactMarker = 'harness-sol-auto-compact';
+const solAutoCompactWindow = 220000;
+const solAutoCompactPatchCount = js.split(solAutoCompactMarker).length - 1;
+
+if (solAutoCompactPatchCount === 0) {
+    const compactFunctionPattern = new RegExp(
+        `function (${identifier})\\((${identifier}),(${identifier})\\)\\{let (${identifier})=(${identifier})\\(\\2\\),(${identifier})=(${identifier})\\(\\),(${identifier})=(${identifier})\\(\\2,\\6\\);`,
+        'g'
+    );
+    const compactFunctions = [...js.matchAll(compactFunctionPattern)].filter((match) => {
+        const suffix = js.slice(match.index, match.index + 5000);
+        return suffix.includes('CLAUDE_CODE_AUTO_COMPACT_WINDOW')
+            && suffix.includes('source:"settings"');
+    });
+
+    if (compactFunctions.length !== 1) {
+        throw new Error(
+            `expected one auto-compact window function, found ${compactFunctions.length}`
+        );
+    }
+
+    const compactFunction = compactFunctions[0];
+    const modelVariable = compactFunction[4];
+    const settingVariable = compactFunction[3];
+    const maximumVariable = compactFunction[8];
+    const functionStart = compactFunction.index;
+    const functionSuffix = js.slice(functionStart, functionStart + 5000);
+    const settingsPattern = new RegExp(
+        `if\\(${settingVariable}!==void 0\\)return\\{window:Math\\.min\\(${maximumVariable},${settingVariable}\\),configured:${settingVariable},source:"settings"\\};`
+    );
+    const settingsMatch = functionSuffix.match(settingsPattern);
+
+    if (!settingsMatch) {
+        throw new Error('could not locate the auto-compact settings override');
+    }
+
+    const insertionPoint = functionStart + settingsMatch.index + settingsMatch[0].length;
+    const solOverride = `if(${modelVariable}==="gpt-5.6-sol"){let harnessSolWindow=${solAutoCompactWindow};return{window:Math.min(${maximumVariable},harnessSolWindow),configured:harnessSolWindow,source:"model-default"}/* ${solAutoCompactMarker} */}`;
+    js = js.slice(0, insertionPoint) + solOverride + js.slice(insertionPoint);
+} else if (solAutoCompactPatchCount === 1) {
+    const patchedWindowPattern = /let harnessSolWindow=\d+;(?=return\{window:Math\.min\([^,]+,harnessSolWindow\),configured:harnessSolWindow,source:"model-default"\}\/\* harness-sol-auto-compact \*\/)/g;
+    const patchedWindowMatches = [...js.matchAll(patchedWindowPattern)];
+
+    if (patchedWindowMatches.length !== 1) {
+        throw new Error(
+            `expected one patched Sol auto-compact window, found ${patchedWindowMatches.length}`
+        );
+    }
+
+    js = js.replace(
+        patchedWindowPattern,
+        `let harnessSolWindow=${solAutoCompactWindow};`
+    );
+} else {
+    throw new Error(
+        `expected zero or one Sol auto-compact patches, found ${solAutoCompactPatchCount}`
+    );
+}
+
 const footerLabels = [...js.matchAll(patchedPattern)].sort((a, b) => b.index - a.index);
 let hiddenCycleHintCount = 0;
 
