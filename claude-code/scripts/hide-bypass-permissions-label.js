@@ -158,7 +158,7 @@ if (usagePatchCount === 0 && usageComponentCount === 0) {
     const textVariable = modeRenderer[2];
     const escapedReactVariable = reactVariable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const compactRootPattern = new RegExp(
-        `${escapedReactVariable}\\.jsxs\\((${identifier}),\\{height:1,overflow:"hidden",children:\\[(${identifier},${identifier},${identifier},${identifier},${identifier}),null\\]\\}\\)`
+        `${escapedReactVariable}\\.jsxs\\((${identifier}),\\{height:1,overflow:"hidden",children:\\[(${identifier},${identifier},${identifier},${identifier},${identifier},null,${identifier})\\]\\}\\)`
     );
     const expandedRootPattern = new RegExp(
         `${escapedReactVariable}\\.jsxs\\((${identifier}),\\{height:1,overflow:"hidden",children:\\[(${identifier}(?:,${identifier}){6})\\]\\}\\)`
