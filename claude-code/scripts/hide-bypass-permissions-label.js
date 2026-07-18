@@ -34,7 +34,7 @@ if (originalMatches.length === 2 && patchedMatches.length === 0) {
 
 const identifier = '[A-Za-z_$][\\w$]*';
 const solAutoCompactMarker = 'harness-sol-auto-compact';
-const solAutoCompactWindow = 220000;
+const solAutoCompactWindow = 353000;
 const solAutoCompactPatchCount = js.split(solAutoCompactMarker).length - 1;
 
 if (solAutoCompactPatchCount === 0) {
