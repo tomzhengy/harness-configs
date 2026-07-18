@@ -36,11 +36,40 @@ function normalizeWindow(window) {
         return null;
     }
 
-    const windowMinutes = Number(window.windowDurationMins ?? window.window_minutes);
+    const windowMinutes = Number(
+        window.windowDurationMins ?? window.window_minutes ?? window.windowMinutes
+    );
     return {
         usedPercent: Math.max(0, Math.min(100, usedPercent)),
         resetsAt: toEpochSeconds(window.resetsAt ?? window.resets_at),
         windowMinutes: Number.isFinite(windowMinutes) ? windowMinutes : null
+    };
+}
+
+function normalizeCodexUsage(usage) {
+    const windows = [
+        normalizeWindow(usage?.primary),
+        normalizeWindow(usage?.secondary)
+    ].filter(Boolean);
+    if (windows.length === 0) {
+        return null;
+    }
+
+    const primary = windows.find((window) => (
+        window.windowMinutes !== null && window.windowMinutes < 1440
+    )) ?? null;
+    const secondary = windows.find((window) => (
+        window.windowMinutes !== null && window.windowMinutes >= 1440
+    )) ?? null;
+
+    if (primary || secondary) {
+        return { provider: 'codex', primary, secondary };
+    }
+
+    return {
+        provider: 'codex',
+        primary: windows[0] ?? null,
+        secondary: windows[1] ?? null
     };
 }
 
@@ -184,13 +213,12 @@ async function fetchCodexUsage() {
         await appServer.exited;
     }
 
-    const primary = normalizeWindow(result?.primary);
-    const secondary = normalizeWindow(result?.secondary);
-    if (!primary && !secondary) {
+    const usage = normalizeCodexUsage(result);
+    if (!usage) {
         throw new Error('codex usage response has no rate-limit windows');
     }
 
-    return { provider: 'codex', primary, secondary };
+    return usage;
 }
 
 async function readCache(provider) {
@@ -229,7 +257,7 @@ async function resolveUsage(provider, snapshot) {
 
     const cached = await readCache(provider);
     if (cached?.fresh) {
-        return cached.data;
+        return provider === 'codex' ? normalizeCodexUsage(cached.data) : cached.data;
     }
 
     try {
@@ -239,7 +267,10 @@ async function resolveUsage(provider, snapshot) {
         await writeCache(provider, data);
         return data;
     } catch {
-        return cached?.data ?? null;
+        if (!cached?.data) {
+            return null;
+        }
+        return provider === 'codex' ? normalizeCodexUsage(cached.data) : cached.data;
     }
 }
 
