@@ -87,16 +87,7 @@
       "mcp__github__search_code",
       "mcp__github__search_issues",
       "mcp__github__search_users",
-      "mcp__ide__getDiagnostics",
-      "mcp__nia__search",
-      "mcp__nia__manage_resource",
-      "mcp__nia__nia_read",
-      "mcp__nia__nia_grep",
-      "mcp__nia__nia_explore",
-      "mcp__nia__nia_research",
-      "mcp__nia__nia_package_search_hybrid",
-      "mcp__nia__context",
-      "mcp__nia__index"
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "defaultMode": "bypassPermissions"

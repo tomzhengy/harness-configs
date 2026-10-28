@@ -10,12 +10,6 @@ command = "bunx"
 args = ["@modelcontextprotocol/server-github"]
 env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]
 
-[mcp_servers.nia]
-command = "uvx"
-args = ["--no-cache", "nia-mcp-server"]
-env = { NIA_API_URL = "https://apigcp.trynia.ai/" }
-env_vars = ["NIA_API_KEY"]
-
 [features]
 multi_agent = true
 goals = true

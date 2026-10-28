@@ -282,5 +282,5 @@ if [ -n "$BACKUP_DIR" ]; then
     echo "backups: $BACKUP_DIR"
 fi
 echo ""
-echo "note: for MCP servers (github, nia), merge claude-code/config/mcp.json"
+echo "note: for MCP servers (github), merge claude-code/config/mcp.json"
 echo "entries into ~/.claude.json manually with your API keys."
