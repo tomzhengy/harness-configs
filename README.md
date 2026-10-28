@@ -11,22 +11,21 @@ claude code and codex cli config files. please feel free to add suggestions!! i 
 - **git worktree workflow** - auto-creates worktrees for non-trivial tasks to isolate branches across sessions
 - **behavioral guardrails** - assumption surfacing, confusion management, change summaries
 - **systems-first design** - iterates on system design before writing code
-- **nia research rules** - integrated nia mcp for external code/docs research and indexing
 - **custom statusline** - git branch, model, and context info
 
 ## codex harness features
 
-- **instruction parity** - codex `AGENTS.md` mirrors the current claude workflow rules: bun-first js/ts, assumption surfacing, worktree workflow, post-edit checks, and nia-first research
+- **instruction parity** - codex `AGENTS.md` mirrors the current claude workflow rules: bun-first js/ts, assumption surfacing, worktree workflow, and post-edit checks
 - **broad command rules** - codex `rules/default.rules` mirrors the current claude command-family allowlist rather than the older tighter readme wording
 - **hook parity** - codex `hooks.json` ports worktree exposure, permission/stop sounds, and post-edit format/lint hooks using codex's native hook system
-- **portable mcp startup** - codex mcp config uses `bunx` for github, `uvx` for nia, and documented env forwarding instead of hard-coded local binary paths
-- **skill-based workflow ports** - local skills cover planning, commit messages, transcript redaction, worktree merges, code review, and nia research
+- **portable mcp startup** - codex mcp config uses `bunx` for github and documented env forwarding instead of hard-coded local binary paths
+- **skill-based workflow ports** - local skills cover planning, commit messages, transcript redaction, worktree merges, and code review
 - **strict review skill** - codex includes the thermo-nuclear code quality review skill from the claude setup as an explicit/manual skill
 - **explicit native gaps** - codex does not currently replicate claude's custom statusline scripting, transcript scroll keybinding, away/back phone-call commands, babysit's claude-specific loop scheduling, or claude-only plugin marketplace entries in this repo
 
 ## cursor harness features
 
-- **rule parity** - `cursor/rules/global.mdc` mirrors the current claude/codex global instructions (bun-first js/ts, assumption surfacing, worktree workflow, commit and pr style) and `cursor/rules/nia.mdc` carries the nia research rules; both install as always-on user rules in `~/.cursor/rules`
+- **rule parity** - `cursor/rules/global.mdc` mirrors the current claude/codex global instructions (bun-first js/ts, assumption surfacing, worktree workflow, commit and pr style) and installs as an always-on user rule in `~/.cursor/rules`
 - **hook parity** - `cursor/hooks.json` ports worktree exposure (`sessionStart`), post-edit biome/prettier format plus bun lint (`afterFileEdit`), and the glass done-sound (`stop`) to cursor's native hook system; `~/.cursor/hooks.json` is shared by the ide and the cli
 - **skill cross-discovery** - cursor natively discovers skills from `~/.claude/skills` and the codex skill dirs, so babysit, agent-transcript, call-user, thermo-nuclear-code-quality-review, plan, commit-message, and friends work in cursor without copies; `disable-model-invocation` skills stay slash-invoke only
 - **away-mode commands** - `/away` and `/back` slash commands (`cursor/commands/`) drive the same `~/.claude/scripts/away-mode.sh` control plane and call-user protocol as the claude setup, so the phone-call blocker alerts work from cursor sessions too
@@ -105,11 +104,11 @@ skills are intentionally not duplicated for cursor: it discovers the claude skil
 
 ### cursor mcp servers
 
-use `cursor/mcp.json` as a reference template and merge those entries into `~/.cursor/mcp.json` with your API keys (github + nia, the same two servers as the claude config). cursor does not expand `${VAR}` placeholders, so replace them with real values in the live file:
+use `cursor/mcp.json` as a reference template and merge those entries into `~/.cursor/mcp.json` with your API keys (github, the same server as the claude config). cursor does not expand `${VAR}` placeholders, so replace them with real values in the live file:
 
 ```bash
-# edit ~/.cursor/mcp.json and add the github + nia entries from cursor/mcp.json,
-# substituting your GITHUB_PERSONAL_ACCESS_TOKEN and NIA_API_KEY
+# edit ~/.cursor/mcp.json and add the github entry from cursor/mcp.json,
+# substituting your GITHUB_PERSONAL_ACCESS_TOKEN
 ```
 
 restart cursor (or reload mcp servers in settings) after editing.
@@ -201,9 +200,6 @@ claude-code/
     expose-worktrees.sh     # surfaces claude worktrees as sibling symlinks
     keybindings.json        # transcript scroll keybinding
 
-  rules/
-    nia.md                  # nia research assistant rules
-
   scripts/
     away-mode.sh            # away-mode control plane (enable/disable)
     call-me.sh              # twilio dial plane, gated by away mode
@@ -219,7 +215,7 @@ claude-code/
 
 cursor/
   setup.sh                 # cursor installer (copy or --link)
-  mcp.json                 # reference MCP server entries (github, nia) for ~/.cursor/mcp.json
+  mcp.json                 # reference MCP server entries (github) for ~/.cursor/mcp.json
   cli-config.json          # cursor-agent config: full permissions, notifications, statusline
   statusline.sh            # custom cli statusline with git branch, model, context
   hooks.json               # cursor lifecycle hooks (ide + cli)
@@ -229,7 +225,6 @@ cursor/
     sound.sh               # non-blocking macos sound helper for hooks
   rules/
     global.mdc             # global instructions ported from CLAUDE.md/AGENTS.md
-    nia.mdc                # nia research assistant rules
   commands/
     away.md                # /away - arm the phone-call blocker alerts
     back.md                # /back - disarm away mode
@@ -249,7 +244,6 @@ codex/
   skills/
     agent-transcript/       # redact and insert agent transcripts into PRs
     plan/                  # implementation planning skill
-    nia-research/          # nia-first external research skill
     commit-message/        # commit title generation skill
     worktree-merge/        # worktree merge and cleanup skill
     code-reviewer/         # manual-use only review skill

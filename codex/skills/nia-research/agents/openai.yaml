@@ -1,4 +1,0 @@
-interface:
-  display_name: "Nia Research"
-  short_description: "Research external docs and code with Nia"
-  default_prompt: "Use $nia-research to research this external codebase or documentation before implementation."

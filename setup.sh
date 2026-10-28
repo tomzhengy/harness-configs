@@ -213,21 +213,6 @@ install_file "$SRC_DIR/config/expose-worktrees.sh" "$CLAUDE_DIR/expose-worktrees
 chmod +x "$CLAUDE_DIR/expose-worktrees.sh"
 echo ""
 
-# --- rules ---
-echo "rules:"
-if [ "$MODE" = "link" ]; then
-    rm -f "$CLAUDE_DIR/rules" 2>/dev/null || true
-    rmdir "$CLAUDE_DIR/rules" 2>/dev/null || true
-    ln -sfn "$SRC_DIR/rules" "$CLAUDE_DIR/rules"
-    echo "  linked rules/"
-else
-    for file in "$SRC_DIR/rules/"*; do
-        [ -f "$file" ] || continue
-        install_file "$file" "$CLAUDE_DIR/rules/$(basename "$file")"
-    done
-fi
-echo ""
-
 # --- scripts ---
 echo "scripts:"
 for file in "$SRC_DIR/scripts/"*; do

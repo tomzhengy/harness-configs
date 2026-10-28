@@ -1,4 +1,5 @@
 # global instructions
+
 ## code style
 
 - use lowercase for all comments
@@ -85,11 +86,6 @@ you have unlimited stamina, the human does not. loop on hard problems, but don't
 
 ## principles
 
-### research
-
-- for all the principles below always use nia to research and index documents when needed
-- use nia mcp as ground truth source
-
 ### scaling
 
 - validate at small scale before scaling up
@@ -117,4 +113,5 @@ don't fill architectural gaps with generic patterns - go back and forth until th
 - do not use `ultra` reasoning for those implementation subagents unless they must independently investigate requirements, make architectural decisions, or the user explicitly requests it
 
 ## canary
+
 - end every message with the exact line: The Red Canary

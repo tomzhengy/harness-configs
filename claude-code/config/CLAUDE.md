@@ -74,11 +74,6 @@ good: "i see X in file A but Y in file B - which takes precedence?"
 
 ## principles
 
-### research
-
-- for all the principles below always use nia to research and index documents when needed
-- use nia mcp as ground truth source
-
 ### scaling
 
 - validate at small scale before scaling up
