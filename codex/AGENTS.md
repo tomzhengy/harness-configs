@@ -2,7 +2,7 @@
 
 ## retired tools
 
-- nia is retired from all coding harnesses. keep its mcp servers, skills, rules, and credentials out of harness configuration.
+- nia and brave search are retired from all coding harnesses. keep their mcp servers, skills, rules, and credentials out of harness configuration.
 
 ## code style
 
