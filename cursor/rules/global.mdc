@@ -5,6 +5,10 @@ alwaysApply: true
 
 # global instructions
 
+## retired tools
+
+- nia is retired from all coding harnesses. keep its mcp servers, skills, rules, and credentials out of harness configuration.
+
 ## canary
 
 - end every message with the exact line: The Red Canary

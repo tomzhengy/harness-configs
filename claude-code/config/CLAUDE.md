@@ -1,5 +1,9 @@
 # global instructions
 
+## retired tools
+
+- nia is retired from all coding harnesses. keep its mcp servers, skills, rules, and credentials out of harness configuration.
+
 ## code style
 
 - use lowercase for all comments
